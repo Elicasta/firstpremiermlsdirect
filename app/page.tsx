@@ -1,5 +1,4 @@
 import { Hero } from "@/components/Hero";
-import { TrustBar } from "@/components/TrustBar";
 import { HowItWorksSteps } from "@/components/HowItWorksSteps";
 import { PACKAGES } from "@/lib/packages";
 import { PackageCard } from "@/components/PackageCard";
@@ -11,7 +10,6 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <TrustBar />
 
       <section className="mx-auto max-w-6xl px-4 py-12 md:py-16">
         <Reveal className="max-w-2xl">
