@@ -1,4 +1,4 @@
-import { resend, FROM_EMAIL } from "./resend";
+import { getResend, FROM_EMAIL } from "./resend";
 import { createServiceRoleClient } from "./supabase/server";
 import {
   adminAlertTemplate,
@@ -43,7 +43,7 @@ export async function sendAdminAlertEmail(order: any) {
   const recipient = process.env.ADMIN_ALERT_EMAIL ?? "orders@firstpremiermlsdirect.com";
 
   try {
-    await resend.emails.send({ from: FROM_EMAIL, to: recipient, subject, text });
+    await getResend().emails.send({ from: FROM_EMAIL, to: recipient, subject, text });
     await logEmail({ orderId: order.id, emailType: "admin_alert", recipient, subject, status: "sent" });
   } catch (err) {
     console.error("Admin alert email failed", err);
@@ -61,7 +61,7 @@ export async function sendClientConfirmationEmail(order: any) {
   const recipient = order.sellers?.email;
 
   try {
-    await resend.emails.send({ from: FROM_EMAIL, to: recipient, subject, text });
+    await getResend().emails.send({ from: FROM_EMAIL, to: recipient, subject, text });
     await logEmail({ orderId: order.id, emailType: "client_confirmation", recipient, subject, status: "sent" });
   } catch (err) {
     console.error("Client confirmation email failed", err);
@@ -80,7 +80,7 @@ export async function sendMissingInfoEmail(order: any, missingItems: string[]) {
   const recipient = order.sellers?.email;
 
   try {
-    await resend.emails.send({ from: FROM_EMAIL, to: recipient, subject, text });
+    await getResend().emails.send({ from: FROM_EMAIL, to: recipient, subject, text });
     await logEmail({ orderId: order.id, emailType: "missing_info", recipient, subject, status: "sent" });
   } catch (err) {
     console.error("Missing info email failed", err);
@@ -101,7 +101,7 @@ export async function sendListingPostedEmail(order: any) {
   const recipient = order.sellers?.email;
 
   try {
-    await resend.emails.send({ from: FROM_EMAIL, to: recipient, subject, text });
+    await getResend().emails.send({ from: FROM_EMAIL, to: recipient, subject, text });
     await logEmail({ orderId: order.id, emailType: "listing_posted", recipient, subject, status: "sent" });
   } catch (err) {
     console.error("Listing posted email failed", err);

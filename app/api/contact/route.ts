@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contactFormSchema } from "@/lib/validations";
-import { resend, FROM_EMAIL } from "@/lib/resend";
+import { getResend, FROM_EMAIL } from "@/lib/resend";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   const { name, email, phone, message } = parsed.data;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: process.env.ADMIN_ALERT_EMAIL ?? "orders@firstpremiermlsdirect.com",
       replyTo: email,
