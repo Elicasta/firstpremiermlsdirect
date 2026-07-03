@@ -11,17 +11,24 @@ export default function HomePage() {
     <>
       <Hero />
 
+      {/* Package cards sit directly under the hero on purpose. This is a flat-fee
+          transaction product, not a consultation — the offer needs to be readable in
+          the first 10 seconds, not three scrolls down. */}
       <section className="mx-auto max-w-6xl px-4 py-12 md:py-16">
-        <Reveal className="max-w-2xl">
+        <Reveal className="text-center">
           <h2 className="font-display text-2xl font-extrabold text-navy sm:text-3xl">
-            Why pay thousands more just to get listed?
+            Flat Fee MLS Packages
           </h2>
-          <p className="mt-4 text-ink/80">
-            Traditional listing commissions can take a serious bite out of your equity. First
-            Premier MLS Direct gives sellers a simple flat-fee option to get MLS exposure while
-            staying in control of their sale.
+          <p className="mx-auto mt-3 max-w-xl text-ink/70">
+            Choose the package that matches how much support you want. Pick one, pay, and
+            you're on your way.
           </p>
         </Reveal>
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          {PACKAGES.map((pkg) => (
+            <PackageCard key={pkg.slug} pkg={pkg} />
+          ))}
+        </div>
       </section>
 
       <section className="bg-gray py-12 md:py-16">
@@ -42,19 +49,16 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-12 md:py-16">
-        <Reveal className="text-center">
+        <Reveal className="max-w-2xl">
           <h2 className="font-display text-2xl font-extrabold text-navy sm:text-3xl">
-            Flat Fee MLS Packages
+            Why pay thousands more just to get listed?
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-ink/70">
-            Choose the package that matches how much support you want.
+          <p className="mt-4 text-ink/80">
+            Traditional listing commissions can take a serious bite out of your equity. First
+            Premier MLS Direct gives sellers a simple flat-fee option to get MLS exposure while
+            staying in control of their sale.
           </p>
         </Reveal>
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {PACKAGES.map((pkg) => (
-            <PackageCard key={pkg.slug} pkg={pkg} />
-          ))}
-        </div>
       </section>
 
       <section className="bg-navy py-12 text-white md:py-16">

@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   const supabase = createServiceRoleClient();
   const { data: order } = await supabase
     .from("orders")
-    .select("id, order_status, payment_status, agreement_status, mls_number, mls_link, properties(property_address), sellers!inner(email)")
+    .select("id, order_status, payment_status, agreement_status, mls_number, mls_link, missing_items, properties(property_address), sellers!inner(email)")
     .eq("id", orderId)
     .eq("sellers.email", email)
     .single();

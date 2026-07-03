@@ -75,36 +75,50 @@ create table if not exists properties (
 -- ============================================================
 -- orders
 -- ============================================================
+-- seller_id and property_id are nullable on purpose: a draft order is created the
+-- moment someone picks a package, BEFORE they've entered any seller/property info,
+-- so Stripe Checkout and photo uploads always have a real order id to attach to.
+-- Seller/property rows get created and linked once the buyer fills out the details
+-- step, right after payment.
 create table if not exists orders (
   id uuid primary key default uuid_generate_v4(),
   package_id uuid not null references packages(id),
-  seller_id uuid not null references sellers(id) on delete cascade,
-  property_id uuid not null references properties(id) on delete cascade,
+  seller_id uuid references sellers(id) on delete cascade,
+  property_id uuid references properties(id) on delete cascade,
   stripe_session_id text,
   payment_status text check (payment_status in ('unpaid','paid','refunded')) default 'unpaid',
   agreement_status text check (agreement_status in ('unsigned','signed')) default 'unsigned',
   order_status text check (order_status in (
-    'new_order','awaiting_agreement','awaiting_payment','awaiting_photos',
-    'needs_review','submitted_to_mls','live','correction_needed','closed_archived'
+    'new_order','awaiting_payment','awaiting_info','awaiting_photos','awaiting_agreement',
+    'needs_review','ready_for_mls','submitted_to_mls','live','correction_needed','closed_archived'
   )) default 'new_order',
   total_amount numeric(10,2) not null,
   selected_addons jsonb not null default '[]'::jsonb,
   mls_number text,
   mls_link text,
   public_link text,
+  missing_items jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
+-- If you already ran an earlier version of this schema without missing_items, run:
+-- alter table orders add column if not exists missing_items jsonb not null default '[]'::jsonb;
+
+-- If you already ran an earlier version of this schema, run these two lines by hand
+-- to drop the old NOT NULL constraint (safe to re-run, no-ops if already nullable):
+-- alter table orders alter column seller_id drop not null;
+-- alter table orders alter column property_id drop not null;
+
 -- Hard rule enforced in application logic (see lib/orderRules.ts) AND mirrored here as a guard:
--- an order cannot move to 'submitted_to_mls' unless payment_status = 'paid' and
--- agreement_status = 'signed'. This trigger blocks it at the database level too.
+-- an order cannot move to 'ready_for_mls' or 'submitted_to_mls' unless payment_status = 'paid'
+-- and agreement_status = 'signed'. This trigger blocks it at the database level too.
 create or replace function enforce_ready_for_mls()
 returns trigger as $$
 begin
-  if new.order_status = 'submitted_to_mls' and
+  if new.order_status in ('ready_for_mls', 'submitted_to_mls') and
      (new.payment_status is distinct from 'paid' or new.agreement_status is distinct from 'signed') then
-    raise exception 'Order cannot move to submitted_to_mls until payment is paid and agreement is signed';
+    raise exception 'Order cannot move to % until payment is paid and agreement is signed', new.order_status;
   end if;
   new.updated_at = now();
   return new;

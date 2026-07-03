@@ -30,9 +30,13 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (agreement && isSigned) {
+    // Old flow signed the agreement BEFORE payment, so this used to send the order back
+    // to "awaiting_payment." In the checkout-first flow, payment already happened at the
+    // very start, so a signed agreement means everything's in, the broker just needs to
+    // look at it.
     await supabase
       .from("orders")
-      .update({ agreement_status: "signed", order_status: "awaiting_payment" })
+      .update({ agreement_status: "signed", order_status: "needs_review" })
       .eq("id", agreement.order_id);
   }
 

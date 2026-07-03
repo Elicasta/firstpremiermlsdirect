@@ -30,12 +30,18 @@ export function Hero() {
           <h1 className="font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
             List Your Home on the MLS for a Flat Fee
           </h1>
+          <p className="mt-1 font-display text-2xl font-extrabold leading-tight text-gold sm:text-3xl">
+            No Traditional Listing Commission
+          </p>
           <p className="mt-4 text-base text-white/85 sm:text-lg">
             Save thousands by getting your property listed through a licensed Florida real
             estate broker without paying a traditional full listing commission.
           </p>
           <p className="mt-4 font-display text-xl font-bold text-gold">
             Packages start at $299.
+          </p>
+          <p className="mt-1 text-xs text-white/60">
+            You still choose whether to offer buyer agent compensation. See our FAQ for details.
           </p>
           <div className="mt-6 flex flex-wrap gap-3 sm:gap-4">
             <ButtonLink href="/start-listing" variant="primary">

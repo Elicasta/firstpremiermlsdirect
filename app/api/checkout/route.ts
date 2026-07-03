@@ -46,7 +46,9 @@ export async function POST(req: NextRequest) {
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     line_items: lineItems,
-    success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/start-listing/confirmation?order=${orderId}`,
+    // Payment now happens FIRST, before any seller/property details exist, so
+    // success sends the buyer straight into the details step, not a confirmation page.
+    success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/start-listing/details?order=${orderId}`,
     cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/start-listing?package=${packageSlug}`,
     metadata: { orderId }
   });

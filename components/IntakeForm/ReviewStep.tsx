@@ -32,8 +32,8 @@ export function ReviewStep({
         <p>Listing price: ${property.desiredListingPrice}</p>
       </div>
       <p className="text-xs text-ink/60">
-        By continuing, you confirm the information above is accurate. You'll sign your listing
-        agreement next, then complete payment.
+        By continuing, you confirm the information above is accurate. Next you'll upload or
+        schedule photos, then sign your listing agreement.
       </p>
     </div>
   );

@@ -42,7 +42,7 @@ export const PACKAGES: Package[] = [
     includes: [
       "MLS listing 6–12 months, depending on MLS rules",
       "Up to 25 professional photos",
-      "Photo shoot by EC Creative Studios",
+      "Photo shoot by a professional photographer",
       "Professionally formatted property description",
       "Pricing guidance with recommended listing range",
       "Showing instructions setup",
@@ -67,7 +67,7 @@ export const PACKAGES: Package[] = [
     includes: [
       "MLS listing up to 12 months, if allowed by MLS rules",
       "Up to 40 professional photos",
-      "Full photography package by EC Creative Studios",
+      "Full photography package by a professional photographer",
       "Interior and exterior photo coverage",
       "Twilight-style photos, if lighting and scheduling allow",
       "Listing headline and description rewritten for marketing impact",

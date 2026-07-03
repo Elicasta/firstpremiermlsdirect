@@ -7,10 +7,12 @@ import { AdminOrderDetail } from "./AdminOrderDetail";
 const STATUS_FILTERS = [
   "all",
   "new_order",
-  "awaiting_agreement",
   "awaiting_payment",
+  "awaiting_info",
   "awaiting_photos",
+  "awaiting_agreement",
   "needs_review",
+  "ready_for_mls",
   "submitted_to_mls",
   "live",
   "correction_needed",
@@ -19,7 +21,7 @@ const STATUS_FILTERS = [
 
 export function AdminOrderTable({ orders }: { orders: any[] }) {
   const [filter, setFilter] = useState("all");
-  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   const filtered = filter === "all" ? orders : orders.filter((o) => o.order_status === filter);
 
@@ -55,16 +57,18 @@ export function AdminOrderTable({ orders }: { orders: any[] }) {
             {filtered.map((order) => (
               <tr key={order.id}>
                 <td className="px-4 py-3">
-                  {order.properties?.property_address}, {order.properties?.city} {order.properties?.state}
+                  {order.properties
+                    ? `${order.properties.property_address}, ${order.properties.city} ${order.properties.state}`
+                    : <span className="text-ink/40">Paid, details not submitted yet</span>}
                 </td>
                 <td className="px-4 py-3">
-                  {order.sellers?.first_name} {order.sellers?.last_name}
+                  {order.sellers ? `${order.sellers.first_name} ${order.sellers.last_name}` : <span className="text-ink/40">—</span>}
                 </td>
                 <td className="px-4 py-3">{order.packages?.name}</td>
                 <td className="px-4 py-3"><StatusBadge status={order.order_status} /></td>
                 <td className="px-4 py-3">${order.total_amount}</td>
                 <td className="px-4 py-3">
-                  <button className="text-blue underline" onClick={() => setSelectedOrder(order)}>
+                  <button className="text-blue underline" onClick={() => setSelectedOrderId(order.id)}>
                     View
                   </button>
                 </td>
@@ -81,8 +85,8 @@ export function AdminOrderTable({ orders }: { orders: any[] }) {
         </table>
       </div>
 
-      {selectedOrder && (
-        <AdminOrderDetail order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+      {selectedOrderId && (
+        <AdminOrderDetail orderId={selectedOrderId} onClose={() => setSelectedOrderId(null)} />
       )}
     </div>
   );

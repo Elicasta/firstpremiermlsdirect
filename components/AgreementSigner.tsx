@@ -34,8 +34,8 @@ export function AgreementSigner({
     <div className="rounded-lg border border-gray bg-white p-6">
       <h3 className="font-display font-bold text-navy">Sign Your Listing Agreement</h3>
       <p className="mt-2 text-sm text-ink/70">
-        You'll review and sign your flat fee MLS listing agreement online. Once signed, we'll
-        move on to payment.
+        Last step. You'll review and sign your flat fee MLS listing agreement online. Once
+        signed, your order goes to the broker for review before it's submitted to the MLS.
       </p>
 
       {status !== "sent" ? (
@@ -55,7 +55,7 @@ export function AgreementSigner({
           <p className="mt-2 text-sm text-ink/60">
             Signed it already?{" "}
             <button className="text-blue underline focus-ring" onClick={onSigned}>
-              Continue to payment
+              Continue
             </button>
           </p>
         </div>

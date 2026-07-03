@@ -20,10 +20,12 @@ export interface Package {
 
 export type OrderStatus =
   | "new_order"
-  | "awaiting_agreement"
   | "awaiting_payment"
+  | "awaiting_info"
   | "awaiting_photos"
+  | "awaiting_agreement"
   | "needs_review"
+  | "ready_for_mls"
   | "submitted_to_mls"
   | "live"
   | "correction_needed"
@@ -32,8 +34,8 @@ export type OrderStatus =
 export interface Order {
   id: string;
   package_id: string;
-  seller_id: string;
-  property_id: string;
+  seller_id: string | null;
+  property_id: string | null;
   stripe_session_id: string | null;
   payment_status: "unpaid" | "paid" | "refunded";
   agreement_status: "unsigned" | "signed";
@@ -43,6 +45,7 @@ export interface Order {
   mls_number?: string | null;
   mls_link?: string | null;
   public_link?: string | null;
+  missing_items?: string[];
   created_at: string;
   updated_at: string;
 }

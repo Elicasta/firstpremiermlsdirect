@@ -55,7 +55,9 @@ export async function sendClientConfirmationEmail(order: any) {
   const { subject, text } = clientConfirmationTemplate({
     firstName: order.sellers?.first_name,
     propertyAddress: order.properties?.property_address,
-    packageName: order.packages?.name
+    packageName: order.packages?.name,
+    orderId: order.id,
+    portalLink: `${process.env.NEXT_PUBLIC_SITE_URL}/portal?order=${order.id}`
   });
 
   const recipient = order.sellers?.email;

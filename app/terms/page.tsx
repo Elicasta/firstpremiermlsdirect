@@ -34,7 +34,13 @@ export default function TermsPage() {
       </p>
       <h2 className="mt-8 font-display text-xl font-bold text-navy">Contact</h2>
       <p className="mt-2 text-ink/80">
-        First Premier Real Estate Services, Inc. — 305-233-0447
+        First Premier Real Estate Services, Inc.
+        <br />
+        Licensed Florida Real Estate Brokerage
+        <br />
+        13265 SW 124 Street, Miami, FL 33186
+        <br />
+        305-233-0447
       </p>
     </section>
   );

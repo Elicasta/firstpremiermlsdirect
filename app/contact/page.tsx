@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { contactFormSchema } from "@/lib/validations";
 import { Button } from "@/components/ui/Button";
+import { Phone, MessageSquare, Mail, CalendarClock } from "lucide-react";
 
 export default function ContactPage() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
@@ -42,13 +43,55 @@ export default function ContactPage() {
   return (
     <section className="mx-auto max-w-2xl px-4 py-12 md:py-16">
       <h1 className="font-display text-3xl font-extrabold sm:text-4xl text-navy">Contact Us</h1>
-      <p className="mt-4 text-ink/70">
-        Questions about a package or your listing? Call{" "}
-        <a href="tel:3052330447" className="font-semibold text-blue">
-          305-233-0447
-        </a>{" "}
-        or send a message below.
-      </p>
+      <p className="mt-4 text-ink/70">Need help choosing a package or have a question about your listing?</p>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <a
+          href="tel:3052330447"
+          className="flex items-center gap-3 rounded-md border border-gray bg-white p-4 hover:border-blue"
+        >
+          <Phone className="h-5 w-5 text-blue" aria-hidden="true" />
+          <div>
+            <p className="font-display text-sm font-bold text-navy">Call</p>
+            <p className="text-sm text-ink/60">305-233-0447</p>
+          </div>
+        </a>
+
+        <a
+          href="sms:3052330447"
+          className="flex items-center gap-3 rounded-md border border-gray bg-white p-4 hover:border-blue"
+        >
+          <MessageSquare className="h-5 w-5 text-blue" aria-hidden="true" />
+          <div>
+            <p className="font-display text-sm font-bold text-navy">Text</p>
+            <p className="text-sm text-ink/60">305-233-0447</p>
+          </div>
+        </a>
+
+        <a
+          href="mailto:orders@firstpremiermlsdirect.com"
+          className="flex items-center gap-3 rounded-md border border-gray bg-white p-4 hover:border-blue"
+        >
+          <Mail className="h-5 w-5 text-blue" aria-hidden="true" />
+          <div>
+            <p className="font-display text-sm font-bold text-navy">Email</p>
+            <p className="text-sm text-ink/60">orders@firstpremiermlsdirect.com</p>
+          </div>
+        </a>
+
+        <button
+          type="button"
+          disabled
+          title="Scheduling link coming soon"
+          className="flex items-center gap-3 rounded-md border border-gray bg-white p-4 text-left opacity-60"
+        >
+          <CalendarClock className="h-5 w-5 text-ink/40" aria-hidden="true" />
+          <div>
+            <p className="font-display text-sm font-bold text-navy">Schedule a Call</p>
+            <p className="text-sm text-ink/60">Coming soon</p>
+          </div>
+        </button>
+      </div>
 
       {status === "success" ? (
         <div className="mt-8 rounded-lg bg-gray p-6">

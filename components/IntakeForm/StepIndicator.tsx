@@ -1,9 +1,9 @@
-const STEPS = ["Package", "Seller Info", "Property Info", "Listing Copy", "Photos", "Review & Sign"];
+const DEFAULT_STEPS = ["Seller Info", "Property Info", "Listing Copy", "Review", "Photos", "Sign Agreement"];
 
-export function StepIndicator({ current }: { current: number }) {
+export function StepIndicator({ current, steps = DEFAULT_STEPS }: { current: number; steps?: string[] }) {
   return (
     <ol className="flex flex-wrap gap-2 text-xs font-display font-bold uppercase tracking-wide">
-      {STEPS.map((label, i) => {
+      {steps.map((label, i) => {
         const step = i + 1;
         const active = step === current;
         const done = step < current;

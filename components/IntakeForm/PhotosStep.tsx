@@ -40,7 +40,7 @@ export function PhotosStep({
                 checked={values.method === "schedule"}
                 onChange={() => set("method", "schedule")}
               />
-              Schedule a photo session with EC Creative Studios
+              Schedule a session with a professional photographer
             </label>
             <label className="flex items-center gap-2 text-sm">
               <input

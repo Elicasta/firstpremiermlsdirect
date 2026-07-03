@@ -34,6 +34,8 @@ export function clientConfirmationTemplate(params: {
   firstName: string;
   propertyAddress: string;
   packageName: string;
+  orderId: string;
+  portalLink: string;
 }) {
   const subject = "We received your MLS listing request";
   const text = `Hi ${params.firstName},
@@ -47,6 +49,10 @@ ${params.propertyAddress}
 Your selected package:
 
 ${params.packageName}
+
+Order ID: ${params.orderId}
+Check your listing status anytime here:
+${params.portalLink}
 
 Our team will review your submission, signed agreement, payment, property details, and photos. Once everything is complete and approved, your listing will be prepared for MLS submission.
 

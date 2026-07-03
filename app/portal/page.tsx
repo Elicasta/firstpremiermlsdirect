@@ -1,16 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { StatusBadge } from "@/components/StatusBadge";
+import { ClientStatusBadge } from "@/components/StatusBadge";
+import { toClientStatus, CLIENT_STATUS_DESCRIPTIONS } from "@/lib/clientStatus";
+import { OrderStatus } from "@/lib/types";
 
 interface PortalOrder {
   id: string;
-  order_status: string;
+  order_status: OrderStatus;
   payment_status: string;
   agreement_status: string;
   mls_number: string | null;
   mls_link: string | null;
-  properties: { property_address: string };
+  missing_items?: string[];
+  properties: { property_address: string } | null;
 }
 
 export default function PortalPage() {
@@ -40,6 +43,8 @@ export default function PortalPage() {
     }
   }
 
+  const clientStatus = order ? toClientStatus(order.order_status) : null;
+
   return (
     <section className="mx-auto max-w-2xl px-4 py-12 md:py-16">
       <h1 className="font-display text-3xl font-extrabold sm:text-4xl text-navy">Client Portal</h1>
@@ -68,25 +73,44 @@ export default function PortalPage() {
 
       {error && <p className="mt-6 text-sm text-red">{error}</p>}
 
-      {order && (
+      {order && clientStatus && (
         <div className="mt-8 rounded-lg bg-gray p-6">
-          <p className="font-display font-bold text-navy">{order.properties.property_address}</p>
-          <div className="mt-3">
-            <StatusBadge status={order.order_status} />
-          </div>
-          <ul className="mt-4 space-y-1 text-sm text-ink/70">
-            <li>Payment: {order.payment_status}</li>
-            <li>Agreement: {order.agreement_status}</li>
-            {order.mls_number && <li>MLS Number: {order.mls_number}</li>}
-            {order.mls_link && (
-              <li>
-                MLS Link:{" "}
-                <a href={order.mls_link} className="text-blue underline" target="_blank" rel="noopener noreferrer">
-                  View listing
-                </a>
-              </li>
-            )}
-          </ul>
+          <p className="font-display font-bold text-navy">
+            {order.properties?.property_address ?? "Your listing"}
+          </p>
+          <div className="mt-3"><ClientStatusBadge status={clientStatus} /></div>
+          <p className="mt-3 text-sm text-ink/70">{CLIENT_STATUS_DESCRIPTIONS[clientStatus]}</p>
+
+          {clientStatus === "Waiting on Info" && order.missing_items && order.missing_items.length > 0 && (
+            <div className="mt-4 rounded-md bg-gold/10 p-4">
+              <p className="font-display text-sm font-bold text-navy">What we still need:</p>
+              <ul className="mt-2 list-inside list-disc text-sm text-ink/80">
+                {order.missing_items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {clientStatus === "Submitted" && order.payment_status === "paid" && !order.properties && (
+            <a
+              href={`/start-listing/details?order=${order.id}`}
+              className="mt-4 inline-block font-display font-bold text-blue underline"
+            >
+              Finish your listing details →
+            </a>
+          )}
+
+          {order.mls_number && (
+            <p className="mt-4 text-sm text-ink/70">MLS Number: {order.mls_number}</p>
+          )}
+          {order.mls_link && (
+            <p className="mt-1 text-sm">
+              <a href={order.mls_link} className="text-blue underline" target="_blank" rel="noopener noreferrer">
+                View on MLS
+              </a>
+            </p>
+          )}
         </div>
       )}
     </section>
