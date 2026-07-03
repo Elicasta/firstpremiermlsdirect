@@ -2,11 +2,11 @@ export const metadata = { title: "About the Broker | First Premier MLS Direct" }
 
 export default function AboutPage() {
   return (
-    <section className="mx-auto max-w-3xl px-4 py-16">
+    <section className="mx-auto max-w-3xl px-4 py-12 md:py-16">
       <p className="font-display text-sm font-bold uppercase tracking-wide text-gold">
         About the Broker
       </p>
-      <h1 className="mt-2 font-display text-4xl font-extrabold text-navy">
+      <h1 className="mt-2 font-display text-3xl font-extrabold sm:text-4xl text-navy">
         Broker Experience You Can Trust. Flat Fee Pricing Built for Today.
       </h1>
 

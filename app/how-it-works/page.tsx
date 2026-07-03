@@ -5,8 +5,8 @@ export const metadata = { title: "How It Works | First Premier MLS Direct" };
 
 export default function HowItWorksPage() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16">
-      <h1 className="font-display text-4xl font-extrabold text-navy">How It Works</h1>
+    <section className="mx-auto max-w-6xl px-4 py-12 md:py-16">
+      <h1 className="font-display text-3xl font-extrabold sm:text-4xl text-navy">How It Works</h1>
       <p className="mt-4 max-w-2xl text-ink/70">
         Most completed listings are submitted within 48 hours after all required information,
         payment, signed documents, and usable photos are received.

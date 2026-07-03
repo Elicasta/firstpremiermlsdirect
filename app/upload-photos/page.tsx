@@ -8,8 +8,8 @@ export default function UploadPhotosPage() {
   const [confirmed, setConfirmed] = useState(false);
 
   return (
-    <section className="mx-auto max-w-2xl px-4 py-16">
-      <h1 className="font-display text-4xl font-extrabold text-navy">Upload Photos</h1>
+    <section className="mx-auto max-w-2xl px-4 py-12 md:py-16">
+      <h1 className="font-display text-3xl font-extrabold sm:text-4xl text-navy">Upload Photos</h1>
       <p className="mt-4 text-ink/70">
         Already started a listing? Enter your order ID from your confirmation email to upload
         or add photos.

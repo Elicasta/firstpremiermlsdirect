@@ -40,8 +40,8 @@ export default function ContactPage() {
   }
 
   return (
-    <section className="mx-auto max-w-2xl px-4 py-16">
-      <h1 className="font-display text-4xl font-extrabold text-navy">Contact Us</h1>
+    <section className="mx-auto max-w-2xl px-4 py-12 md:py-16">
+      <h1 className="font-display text-3xl font-extrabold sm:text-4xl text-navy">Contact Us</h1>
       <p className="mt-4 text-ink/70">
         Questions about a package or your listing? Call{" "}
         <a href="tel:3052330447" className="font-semibold text-blue">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 const FAQS: { q: string; a: string }[] = [
   {
@@ -63,12 +64,17 @@ export function FAQAccordion() {
         return (
           <div key={item.q}>
             <button
-              className="focus-ring flex w-full items-center justify-between px-5 py-4 text-left"
+              className="focus-ring flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
               aria-expanded={isOpen}
               onClick={() => setOpenIndex(isOpen ? null : i)}
             >
               <span className="font-display font-bold text-navy">{item.q}</span>
-              <span className="text-xl text-red">{isOpen ? "–" : "+"}</span>
+              <ChevronDown
+                className={`h-5 w-5 flex-shrink-0 text-red transition-transform duration-300 ${
+                  isOpen ? "rotate-180" : ""
+                }`}
+                aria-hidden="true"
+              />
             </button>
             {isOpen && <p className="px-5 pb-4 text-sm text-ink/70">{item.a}</p>}
           </div>

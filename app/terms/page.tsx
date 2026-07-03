@@ -2,8 +2,8 @@ export const metadata = { title: "Terms of Service | First Premier MLS Direct" }
 
 export default function TermsPage() {
   return (
-    <section className="mx-auto max-w-3xl px-4 py-16 prose prose-sm max-w-none">
-      <h1 className="font-display text-4xl font-extrabold text-navy">Terms of Service</h1>
+    <section className="mx-auto max-w-3xl px-4 py-12 md:py-16 prose prose-sm max-w-none">
+      <h1 className="font-display text-3xl font-extrabold sm:text-4xl text-navy">Terms of Service</h1>
       <p className="mt-6 text-ink/80">
         First Premier MLS Direct is a service of First Premier Real Estate Services, Inc., a
         licensed Florida real estate brokerage. By purchasing a package, you agree to the

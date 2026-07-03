@@ -1,15 +1,17 @@
+import { Check, Star, Minus } from "lucide-react";
 import { Package } from "@/lib/types";
 import { ButtonLink } from "./ui/Button";
 
 export function PackageCard({ pkg }: { pkg: Package }) {
   return (
     <div
-      className={`relative flex flex-col rounded-lg border bg-white p-6 shadow-sm ${
-        pkg.popular ? "border-red border-2" : "border-gray"
+      className={`group relative flex flex-col rounded-lg border bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
+        pkg.popular ? "border-2 border-red md:scale-105" : "border-gray"
       }`}
     >
       {pkg.popular && (
-        <span className="absolute -top-3 left-6 rounded-full bg-red px-3 py-1 font-display text-xs font-bold uppercase tracking-wide text-white">
+        <span className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-red px-3 py-1 font-display text-xs font-bold uppercase tracking-wide text-white">
+          <Star className="h-3 w-3 fill-current" aria-hidden="true" />
           Most Popular
         </span>
       )}
@@ -24,7 +26,7 @@ export function PackageCard({ pkg }: { pkg: Package }) {
       <ul className="mt-4 flex-1 space-y-2 text-sm">
         {pkg.includes.map((item) => (
           <li key={item} className="flex gap-2">
-            <span className="mt-0.5 text-blue">✓</span>
+            <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue" aria-hidden="true" />
             <span>{item}</span>
           </li>
         ))}
@@ -34,7 +36,7 @@ export function PackageCard({ pkg }: { pkg: Package }) {
         <ul className="mt-3 space-y-1 border-t border-gray pt-3 text-sm text-ink/50">
           {pkg.excludes.map((item) => (
             <li key={item} className="flex gap-2">
-              <span className="mt-0.5">–</span>
+              <Minus className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
               <span>{item}</span>
             </li>
           ))}

@@ -2,8 +2,8 @@ export const metadata = { title: "Privacy Policy | First Premier MLS Direct" };
 
 export default function PrivacyPage() {
   return (
-    <section className="mx-auto max-w-3xl px-4 py-16 prose prose-sm max-w-none">
-      <h1 className="font-display text-4xl font-extrabold text-navy">Privacy Policy</h1>
+    <section className="mx-auto max-w-3xl px-4 py-12 md:py-16 prose prose-sm max-w-none">
+      <h1 className="font-display text-3xl font-extrabold sm:text-4xl text-navy">Privacy Policy</h1>
       <p className="mt-6 text-ink/80">
         First Premier Real Estate Services, Inc. collects the information you provide during
         the listing intake process, including seller contact details, property information, and
