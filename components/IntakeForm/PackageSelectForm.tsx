@@ -29,7 +29,10 @@ export function PackageSelectForm({ initialPackageSlug }: { initialPackageSlug?:
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ packageSlug, selectedAddons })
       });
-      if (!draftRes.ok) throw new Error("Failed to start your order");
+      if (!draftRes.ok) {
+        const body = await draftRes.json().catch(() => ({}));
+        throw new Error(body.error || `Failed to start your order (${draftRes.status})`);
+      }
       const { orderId } = await draftRes.json();
 
       // Step 2: pay first, Amazon-checkout style. Details come after.
@@ -38,12 +41,17 @@ export function PackageSelectForm({ initialPackageSlug }: { initialPackageSlug?:
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId, packageSlug, selectedAddons })
       });
-      if (!checkoutRes.ok) throw new Error("Failed to start checkout");
+      if (!checkoutRes.ok) {
+        const body = await checkoutRes.json().catch(() => ({}));
+        throw new Error(body.error || `Failed to start checkout (${checkoutRes.status})`);
+      }
       const { checkoutUrl } = await checkoutRes.json();
 
       window.location.href = checkoutUrl;
     } catch (err) {
-      setError("Something went wrong starting your order. Please try again or call 305-233-0447.");
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setError(`${message} (call 305-233-0447 if this keeps happening)`);
+      console.error("Checkout failed:", err);
       setLoading(false);
     }
   }
