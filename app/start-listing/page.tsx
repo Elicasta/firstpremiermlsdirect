@@ -14,9 +14,9 @@ export default function StartListingPage({
           Start Your Listing
         </h1>
         <p className="mt-4 text-ink/70">
-          Pick your package and pay first, Amazon-checkout style. Once payment goes through,
-          you'll tell us about your property, upload or schedule photos, and sign your listing
-          agreement.
+          Choose your package and pay securely online. After payment, you'll complete a short
+          contact form with your name, phone, email, and property address. John Duran will then
+          email the official listing forms and next steps directly from the brokerage.
         </p>
       </div>
       <div className="mt-10">
