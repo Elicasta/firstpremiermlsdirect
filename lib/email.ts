@@ -1,6 +1,7 @@
 import { getResend, FROM_EMAIL, REPLY_TO_EMAIL } from "./resend";
 import { createServiceRoleClient } from "./supabase/server";
 import { ADDONS } from "./packages";
+import { formatPurchaseId } from "./purchase-id";
 import {
   adminAlertTemplate,
   clientConfirmationTemplate,
@@ -67,7 +68,7 @@ export async function sendAdminAlertEmail(order: any) {
     sellerPhone: order.sellers?.phone ?? "Not provided",
     sellerEmail: order.sellers?.email ?? "Not provided",
     propertyAddress: fullAddress(order),
-    orderId: order.id
+    orderId: formatPurchaseId(order.id)
   });
 
   const recipient = process.env.ADMIN_ALERT_EMAIL ?? "Jduran238@bellsouth.net";
@@ -98,7 +99,7 @@ export async function sendClientConfirmationEmail(order: any) {
     packageName: order.packages?.name ?? "MLS Package",
     addons: purchasedAddons(order),
     amount: formattedAmount(order),
-    orderId: order.id
+    orderId: formatPurchaseId(order.id)
   });
 
   try {
