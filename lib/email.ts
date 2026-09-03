@@ -40,7 +40,7 @@ export async function sendAdminAlertEmail(order: any) {
     photoSessionNeeded: false
   });
 
-  const recipient = process.env.ADMIN_ALERT_EMAIL ?? "orders@firstpremiermlsdirect.com";
+  const recipient = process.env.ADMIN_ALERT_EMAIL ?? "Jduran238@bellsouth.net";
 
   try {
     await getResend().emails.send({ from: FROM_EMAIL, to: recipient, subject, text });
