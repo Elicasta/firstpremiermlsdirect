@@ -15,6 +15,6 @@ export function getResend(): Resend {
 export const FROM_EMAIL =
   process.env.RESEND_FROM_EMAIL ?? "First Premier MLS Direct <info@premiermlsdirect.com>";
 
-// Customer-facing replies stay on-brand. Cloudflare Email Routing forwards
-// info@premiermlsdirect.com to John Duran's Bellsouth inbox.
+// Customer-facing replies always return to the branded address.
+// Cloudflare Email Routing forwards this address to John Duran's Bellsouth inbox.
 export const REPLY_TO_EMAIL = "info@premiermlsdirect.com";
