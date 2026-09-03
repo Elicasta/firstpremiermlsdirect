@@ -1,6 +1,7 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { stripe } from "@/lib/stripe";
 import { sendAdminAlertEmail, sendClientConfirmationEmail } from "@/lib/email";
+import { formatPurchaseId } from "@/lib/purchase-id";
 import { ContactSubmissionForm } from "@/components/IntakeForm/ContactSubmissionForm";
 import { ButtonLink } from "@/components/ui/Button";
 
@@ -111,6 +112,7 @@ export default async function StartListingDetailsPage({
   const seller = Array.isArray(sellerRelation) ? sellerRelation[0] : sellerRelation;
   const property = Array.isArray(propertyRelation) ? propertyRelation[0] : propertyRelation;
   const pkg = Array.isArray(packageRelation) ? packageRelation[0] : packageRelation;
+  const purchaseId = formatPurchaseId(orderId);
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-12 md:py-16">
@@ -150,7 +152,7 @@ export default async function StartListingDetailsPage({
         </div>
 
         <p className="mt-5 text-xs text-ink/50">
-          Purchase ID: <span className="font-semibold text-navy">{orderId}</span>
+          Purchase ID: <span className="font-semibold tracking-wide text-navy">{purchaseId}</span>
         </p>
 
         <div className="mt-6">
