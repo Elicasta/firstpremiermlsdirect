@@ -24,6 +24,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const supabase = createServiceRoleClient();
+  const { data: order } = await supabase
+    .from("orders")
+    .select("id, payment_status, sellers(email)")
+    .eq("id", orderId)
+    .single();
+
+  if (!order) {
+    return NextResponse.json({ error: "Order not found." }, { status: 404 });
+  }
+
+  if (order.payment_status === "paid") {
+    return NextResponse.json({ error: "This order has already been paid." }, { status: 409 });
+  }
+
   const priceId = STRIPE_PRICE_MAP[packageSlug];
   const lineItems: Array<{ price?: string; price_data?: any; quantity: number }> = [];
 
@@ -53,18 +68,20 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  const sellerRelation = (order as any).sellers;
+  const customerEmail = Array.isArray(sellerRelation) ? sellerRelation[0]?.email : sellerRelation?.email;
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: lineItems,
-      // Include the Checkout Session ID in the return URL. The details page uses it as
-      // a server-side fallback if the Stripe webhook arrives a moment after the redirect.
+      customer_email: customerEmail || undefined,
+      client_reference_id: orderId,
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/start-listing/details?order=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/start-listing?package=${packageSlug}`,
       metadata: { orderId }
     });
 
-    const supabase = createServiceRoleClient();
     await supabase.from("orders").update({ stripe_session_id: session.id }).eq("id", orderId);
 
     return NextResponse.json({ checkoutUrl: session.url });
