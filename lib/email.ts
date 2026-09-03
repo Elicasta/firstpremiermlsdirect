@@ -7,9 +7,6 @@ import {
   listingPostedTemplate
 } from "@/emails/templates";
 
-// Each send* function fires the email via Resend AND writes a row to email_logs,
-// so the admin dashboard has a full audit trail per order.
-
 async function logEmail(params: {
   orderId: string;
   emailType: "admin_alert" | "client_confirmation" | "missing_info" | "listing_posted";
@@ -27,17 +24,26 @@ async function logEmail(params: {
   });
 }
 
+function fullAddress(order: any) {
+  const property = order.properties;
+  if (!property) return "Property address not available";
+  return [
+    property.property_address,
+    [property.city, property.state, property.zip].filter(Boolean).join(" ")
+  ]
+    .filter(Boolean)
+    .join(", ");
+}
+
 export async function sendAdminAlertEmail(order: any) {
-  const { subject, text } = adminAlertTemplate({
+  const { subject, text, html } = adminAlertTemplate({
     packageName: order.packages?.name ?? "Unknown package",
-    amount: `$${order.total_amount}`,
-    sellerName: `${order.sellers?.first_name} ${order.sellers?.last_name}`,
-    sellerPhone: order.sellers?.phone,
-    sellerEmail: order.sellers?.email,
-    propertyAddress: order.properties?.property_address,
-    photoCount: 0,
-    agreementSigned: order.agreement_status === "signed",
-    photoSessionNeeded: false
+    amount: `$${Number(order.total_amount ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+    sellerName: `${order.sellers?.first_name ?? ""} ${order.sellers?.last_name ?? ""}`.trim(),
+    sellerPhone: order.sellers?.phone ?? "Not provided",
+    sellerEmail: order.sellers?.email ?? "Not provided",
+    propertyAddress: fullAddress(order),
+    orderId: order.id
   });
 
   const recipient = process.env.ADMIN_ALERT_EMAIL ?? "Jduran238@bellsouth.net";
@@ -46,9 +52,10 @@ export async function sendAdminAlertEmail(order: any) {
     await getResend().emails.send({
       from: FROM_EMAIL,
       to: recipient,
-      replyTo: order.sellers?.email || REPLY_TO_EMAIL,
+      replyTo: order.sellers?.email || undefined,
       subject,
-      text
+      text,
+      html
     });
     await logEmail({ orderId: order.id, emailType: "admin_alert", recipient, subject, status: "sent" });
   } catch (err) {
@@ -58,18 +65,25 @@ export async function sendAdminAlertEmail(order: any) {
 }
 
 export async function sendClientConfirmationEmail(order: any) {
-  const { subject, text } = clientConfirmationTemplate({
-    firstName: order.sellers?.first_name,
-    propertyAddress: order.properties?.property_address,
-    packageName: order.packages?.name,
-    orderId: order.id,
-    portalLink: `${process.env.NEXT_PUBLIC_SITE_URL}/portal?order=${order.id}`
+  const recipient = order.sellers?.email;
+  if (!recipient) return;
+
+  const { subject, text, html } = clientConfirmationTemplate({
+    firstName: order.sellers?.first_name ?? "there",
+    propertyAddress: fullAddress(order),
+    packageName: order.packages?.name ?? "MLS Package",
+    orderId: order.id
   });
 
-  const recipient = order.sellers?.email;
-
   try {
-    await getResend().emails.send({ from: FROM_EMAIL, to: recipient, replyTo: REPLY_TO_EMAIL, subject, text });
+    await getResend().emails.send({
+      from: FROM_EMAIL,
+      to: recipient,
+      replyTo: REPLY_TO_EMAIL,
+      subject,
+      text,
+      html
+    });
     await logEmail({ orderId: order.id, emailType: "client_confirmation", recipient, subject, status: "sent" });
   } catch (err) {
     console.error("Client confirmation email failed", err);
@@ -78,17 +92,24 @@ export async function sendClientConfirmationEmail(order: any) {
 }
 
 export async function sendMissingInfoEmail(order: any, missingItems: string[]) {
-  const { subject, text } = missingInfoTemplate({
-    firstName: order.sellers?.first_name,
-    propertyAddress: order.properties?.property_address,
-    missingItems: missingItems.map((item) => `- ${item}`).join("\n"),
-    portalLink: `${process.env.NEXT_PUBLIC_SITE_URL}/portal?order=${order.id}`
+  const recipient = order.sellers?.email;
+  if (!recipient) return;
+
+  const { subject, text, html } = missingInfoTemplate({
+    firstName: order.sellers?.first_name ?? "there",
+    propertyAddress: fullAddress(order),
+    missingItems: missingItems.map((item) => `- ${item}`).join("\n")
   });
 
-  const recipient = order.sellers?.email;
-
   try {
-    await getResend().emails.send({ from: FROM_EMAIL, to: recipient, replyTo: REPLY_TO_EMAIL, subject, text });
+    await getResend().emails.send({
+      from: FROM_EMAIL,
+      to: recipient,
+      replyTo: REPLY_TO_EMAIL,
+      subject,
+      text,
+      html
+    });
     await logEmail({ orderId: order.id, emailType: "missing_info", recipient, subject, status: "sent" });
   } catch (err) {
     console.error("Missing info email failed", err);
@@ -97,19 +118,29 @@ export async function sendMissingInfoEmail(order: any, missingItems: string[]) {
 }
 
 export async function sendListingPostedEmail(order: any) {
-  const { subject, text } = listingPostedTemplate({
-    firstName: order.sellers?.first_name,
-    propertyAddress: order.properties?.property_address,
+  const recipient = order.sellers?.email;
+  if (!recipient) return;
+
+  const { subject, text, html } = listingPostedTemplate({
+    firstName: order.sellers?.first_name ?? "there",
+    propertyAddress: fullAddress(order),
     mlsNumber: order.mls_number ?? "",
-    listingPrice: `$${order.properties?.listing_price}`,
+    listingPrice: order.properties?.listing_price
+      ? `$${Number(order.properties.listing_price).toLocaleString("en-US")}`
+      : "",
     mlsLink: order.mls_link ?? "",
     publicLink: order.public_link ?? ""
   });
 
-  const recipient = order.sellers?.email;
-
   try {
-    await getResend().emails.send({ from: FROM_EMAIL, to: recipient, replyTo: REPLY_TO_EMAIL, subject, text });
+    await getResend().emails.send({
+      from: FROM_EMAIL,
+      to: recipient,
+      replyTo: REPLY_TO_EMAIL,
+      subject,
+      text,
+      html
+    });
     await logEmail({ orderId: order.id, emailType: "listing_posted", recipient, subject, status: "sent" });
   } catch (err) {
     console.error("Listing posted email failed", err);
