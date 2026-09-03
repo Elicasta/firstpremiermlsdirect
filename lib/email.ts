@@ -36,22 +36,33 @@ function fullAddress(order: any) {
     .join(", ");
 }
 
-function packageSummary(order: any) {
-  const packageName = order.packages?.name ?? "MLS Package";
+function purchasedAddons(order: any) {
   const selectedAddonIds = Array.isArray(order.selected_addons) ? order.selected_addons : [];
-  const selectedAddons = selectedAddonIds.flatMap((id: string) => {
-    const addon = ADDONS.find((item) => item.id === id);
-    return addon ? [`${addon.name} (+$${addon.price})`] : [];
-  });
 
-  if (!selectedAddons.length) return `${packageName} • No add-ons`;
-  return `${packageName} • Add-ons: ${selectedAddons.join(", ")}`;
+  return selectedAddonIds.flatMap((id: string) => {
+    const addon = ADDONS.find((item) => item.id === id);
+    if (!addon) return [];
+    return [
+      {
+        name: addon.name,
+        price: `+$${addon.price.toLocaleString("en-US")}`
+      }
+    ];
+  });
+}
+
+function formattedAmount(order: any) {
+  return `$${Number(order.total_amount ?? 0).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })}`;
 }
 
 export async function sendAdminAlertEmail(order: any) {
   const { subject, text, html } = adminAlertTemplate({
-    packageName: packageSummary(order),
-    amount: `$${Number(order.total_amount ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+    packageName: order.packages?.name ?? "MLS Package",
+    addons: purchasedAddons(order),
+    amount: formattedAmount(order),
     sellerName: `${order.sellers?.first_name ?? ""} ${order.sellers?.last_name ?? ""}`.trim(),
     sellerPhone: order.sellers?.phone ?? "Not provided",
     sellerEmail: order.sellers?.email ?? "Not provided",
@@ -84,7 +95,9 @@ export async function sendClientConfirmationEmail(order: any) {
   const { subject, text, html } = clientConfirmationTemplate({
     firstName: order.sellers?.first_name ?? "there",
     propertyAddress: fullAddress(order),
-    packageName: packageSummary(order),
+    packageName: order.packages?.name ?? "MLS Package",
+    addons: purchasedAddons(order),
+    amount: formattedAmount(order),
     orderId: order.id
   });
 
