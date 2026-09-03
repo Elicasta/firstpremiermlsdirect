@@ -11,9 +11,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid package" }, { status: 400 });
   }
 
-  // These two are the most common way this route silently 500s: Stripe rejects a
-  // checkout session whose success_url/cancel_url is "undefined/..." if the site
-  // URL env var isn't set, and the SDK call throws before anything gets caught.
   if (!process.env.NEXT_PUBLIC_SITE_URL) {
     return NextResponse.json(
       { error: "Server misconfigured: NEXT_PUBLIC_SITE_URL is not set in Vercel." },
@@ -31,10 +28,8 @@ export async function POST(req: NextRequest) {
   const lineItems: Array<{ price?: string; price_data?: any; quantity: number }> = [];
 
   if (priceId) {
-    // Preferred: use a pre-configured Stripe Price object for the package.
     lineItems.push({ price: priceId, quantity: 1 });
   } else {
-    // Fallback: build the line item on the fly if a Price ID hasn't been set up yet.
     lineItems.push({
       price_data: {
         currency: "usd",
@@ -62,9 +57,9 @@ export async function POST(req: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: lineItems,
-      // Payment now happens FIRST, before any seller/property details exist, so
-      // success sends the buyer straight into the details step, not a confirmation page.
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/start-listing/details?order=${orderId}`,
+      // Include the Checkout Session ID in the return URL. The details page uses it as
+      // a server-side fallback if the Stripe webhook arrives a moment after the redirect.
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/start-listing/details?order=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/start-listing?package=${packageSlug}`,
       metadata: { orderId }
     });
