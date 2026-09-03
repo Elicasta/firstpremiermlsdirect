@@ -1,4 +1,4 @@
-import { ClipboardList, CreditCard, ContactRound, MailCheck } from "lucide-react";
+import { ClipboardList, ContactRound, CreditCard, MailCheck } from "lucide-react";
 import { Reveal } from "./Reveal";
 
 const STEPS = [
@@ -8,19 +8,19 @@ const STEPS = [
     body: "Pick the flat fee MLS package that fits your needs."
   },
   {
+    icon: ContactRound,
+    title: "Send Your Contact Info",
+    body: "Give us your name, phone, email, and the property address before checkout."
+  },
+  {
     icon: CreditCard,
     title: "Pay Securely Online",
     body: "Complete your one-time package payment through Stripe."
   },
   {
-    icon: ContactRound,
-    title: "Send Your Contact Info",
-    body: "Give us your name, phone, email, and the property address."
-  },
-  {
     icon: MailCheck,
     title: "John Sends the Forms",
-    body: "John Duran will email the required listing forms and walk you through the next steps."
+    body: "You receive a confirmation, then John Duran emails the required listing forms and next steps."
   }
 ];
 
