@@ -1,46 +1,44 @@
-import { ClipboardList, CreditCard, FileText, Camera, PenLine, Rocket } from "lucide-react";
+import { ClipboardList, CreditCard, ContactRound, MailCheck } from "lucide-react";
 import { Reveal } from "./Reveal";
 
 const STEPS = [
   {
     icon: ClipboardList,
     title: "Choose Your Package",
-    body: "Pick the MLS package that fits your needs."
+    body: "Pick the flat fee MLS package that fits your needs."
   },
   {
     icon: CreditCard,
-    title: "Pay Online",
-    body: "Pay your flat fee first, Amazon-checkout style. No property details needed yet."
+    title: "Pay Securely Online",
+    body: "Complete your one-time package payment through Stripe."
   },
   {
-    icon: FileText,
-    title: "Submit Property Details",
-    body: "Tell us your address, seller info, and listing copy right after payment."
+    icon: ContactRound,
+    title: "Send Your Contact Info",
+    body: "Give us your name, phone, email, and the property address."
   },
   {
-    icon: Camera,
-    title: "Upload or Schedule Photos",
-    body: "Upload your own photos, or schedule a session if your package includes one."
-  },
-  {
-    icon: PenLine,
-    title: "Sign the Agreement",
-    body: "Review and sign your listing agreement online."
-  },
-  {
-    icon: Rocket,
-    title: "Broker Review & MLS",
-    body: "The broker reviews your submission, then your listing goes live on the MLS."
+    icon: MailCheck,
+    title: "John Sends the Forms",
+    body: "John Duran will email the required listing forms and walk you through the next steps."
   }
 ];
 
 export function HowItWorksSteps() {
   return (
-    <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+    <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       {STEPS.map((step, i) => (
-        <Reveal key={step.title} delay={i * 100} as="li" className="group h-full rounded-lg bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+        <Reveal
+          key={step.title}
+          delay={i * 100}
+          as="li"
+          className="group h-full rounded-lg bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+        >
           <div className="flex items-center gap-2">
-            <step.icon className="h-5 w-5 text-blue transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
+            <step.icon
+              className="h-5 w-5 text-blue transition-transform duration-300 group-hover:scale-110"
+              aria-hidden="true"
+            />
             <span className="font-display text-2xl font-extrabold text-gold">
               {String(i + 1).padStart(2, "0")}
             </span>
