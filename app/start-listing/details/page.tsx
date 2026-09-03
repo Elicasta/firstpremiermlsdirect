@@ -1,9 +1,8 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import { getPackageBySlug } from "@/lib/packages";
-import { DetailsWizard } from "@/components/IntakeForm/DetailsWizard";
+import { ContactSubmissionForm } from "@/components/IntakeForm/ContactSubmissionForm";
 import { ButtonLink } from "@/components/ui/Button";
 
-export const metadata = { title: "Complete Your Listing | First Premier MLS Direct" };
+export const metadata = { title: "Complete Your Order | First Premier MLS Direct" };
 
 export default async function StartListingDetailsPage({
   searchParams
@@ -19,7 +18,7 @@ export default async function StartListingDetailsPage({
   const supabase = createServiceRoleClient();
   const { data: order } = await supabase
     .from("orders")
-    .select("id, payment_status, selected_addons, packages(slug)")
+    .select("id, payment_status")
     .eq("id", orderId)
     .single();
 
@@ -29,30 +28,24 @@ export default async function StartListingDetailsPage({
 
   if (order.payment_status !== "paid") {
     return (
-      <MissingOrder reason="Payment hasn't gone through yet for this order. If you already paid, give it a minute and refresh — otherwise start over below." />
+      <MissingOrder reason="Payment hasn't gone through yet for this order. If you already paid, give it a minute and refresh." />
     );
-  }
-
-  const packageSlug = (order.packages as unknown as { slug: string } | null)?.slug ?? "standard";
-  const pkg = getPackageBySlug(packageSlug);
-
-  if (!pkg) {
-    return <MissingOrder reason="Something's off with this order's package. Call 305-233-0447 and we'll sort it out." />;
   }
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-12 md:py-16">
       <div className="mx-auto max-w-2xl text-center">
-        <h1 className="font-display text-3xl font-extrabold sm:text-4xl text-navy">
-          Payment Received. Let's Finish Your Listing.
+        <p className="font-display text-sm font-bold uppercase tracking-wide text-gold">Payment received</p>
+        <h1 className="mt-2 font-display text-3xl font-extrabold sm:text-4xl text-navy">
+          Send Us Your Contact Information
         </h1>
         <p className="mt-4 text-ink/70">
-          Tell us about your property, upload or schedule photos, and sign your listing
-          agreement. Takes about 10 minutes.
+          That's all we need online for now. After you submit this short form, John Duran will
+          email the required listing documents and next steps directly from the brokerage.
         </p>
       </div>
       <div className="mt-10">
-        <DetailsWizard orderId={order.id} pkg={pkg} addons={order.selected_addons ?? []} />
+        <ContactSubmissionForm orderId={order.id} />
       </div>
     </section>
   );
