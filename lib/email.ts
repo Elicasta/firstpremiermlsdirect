@@ -1,5 +1,6 @@
 import { getResend, FROM_EMAIL, REPLY_TO_EMAIL } from "./resend";
 import { createServiceRoleClient } from "./supabase/server";
+import { ADDONS } from "./packages";
 import {
   adminAlertTemplate,
   clientConfirmationTemplate,
@@ -35,9 +36,21 @@ function fullAddress(order: any) {
     .join(", ");
 }
 
+function packageSummary(order: any) {
+  const packageName = order.packages?.name ?? "MLS Package";
+  const selectedAddonIds = Array.isArray(order.selected_addons) ? order.selected_addons : [];
+  const selectedAddons = selectedAddonIds
+    .map((id: string) => ADDONS.find((addon) => addon.id === id))
+    .filter(Boolean)
+    .map((addon) => `${addon!.name} (+$${addon!.price})`);
+
+  if (!selectedAddons.length) return `${packageName} • No add-ons`;
+  return `${packageName} • Add-ons: ${selectedAddons.join(", ")}`;
+}
+
 export async function sendAdminAlertEmail(order: any) {
   const { subject, text, html } = adminAlertTemplate({
-    packageName: order.packages?.name ?? "Unknown package",
+    packageName: packageSummary(order),
     amount: `$${Number(order.total_amount ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
     sellerName: `${order.sellers?.first_name ?? ""} ${order.sellers?.last_name ?? ""}`.trim(),
     sellerPhone: order.sellers?.phone ?? "Not provided",
@@ -71,7 +84,7 @@ export async function sendClientConfirmationEmail(order: any) {
   const { subject, text, html } = clientConfirmationTemplate({
     firstName: order.sellers?.first_name ?? "there",
     propertyAddress: fullAddress(order),
-    packageName: order.packages?.name ?? "MLS Package",
+    packageName: packageSummary(order),
     orderId: order.id
   });
 
