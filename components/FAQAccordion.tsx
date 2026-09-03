@@ -6,67 +6,71 @@ import { ChevronDown } from "lucide-react";
 const FAQS: { q: string; a: string }[] = [
   {
     q: "Is this legal?",
-    a: "Yes. First Premier MLS Direct is a service of First Premier Real Estate Services, Inc., a licensed Florida real estate brokerage. Flat fee MLS listing is a standard, legal alternative to a traditional full-commission listing."
+    a: "First Premier MLS Direct is a service of First Premier Real Estate Services, Inc., a licensed Florida real estate brokerage. John Duran is the broker, license 0512688, and the office license is CQ1025438. Flat fee MLS service is offered through the licensed brokerage."
   },
   {
-    q: "Why is this so cheap?",
-    a: "Because you're paying for MLS entry and broker oversight, not for a full-service agent to run your entire sale. A traditional listing agent handles showings, negotiation, and marketing for a percentage of your sale price. Here, you handle those parts yourself and pay one flat fee for MLS exposure instead."
+    q: "Why is this so affordable?",
+    a: "Because you're buying a defined flat fee MLS service instead of a traditional full-service listing arrangement priced as a percentage of the sale. You handle more of the sale yourself, while the brokerage handles the MLS listing services included in your package."
   },
   {
     q: "Do I still work with agents?",
-    a: "You may. Buyers often come with their own agent, and that agent represents the buyer, not you. You can choose whether to offer that agent compensation. First Premier Real Estate Services, Inc. is your listing broker of record, not a traditional full-service listing agent."
+    a: "You may. Buyers can still be represented by their own real estate agents. Any buyer-agent compensation or other transaction terms are handled separately and should be discussed with the broker as part of your listing paperwork."
   },
   {
-    q: "Do I pay commission?",
-    a: "You pay one flat fee for your package, not a percentage-based listing commission. You may choose to offer compensation to a buyer's agent if one is involved, but that's your decision, not a fee to us."
+    q: "Do I pay a listing commission?",
+    a: "You pay the flat fee shown for your selected package instead of a traditional percentage-based listing commission to First Premier MLS Direct. Other transaction costs or compensation may still apply depending on your sale and the terms you agree to."
   },
   {
     q: "Am I selling the home myself?",
-    a: "Yes. You handle showings, buyer questions, and negotiations unless you arrange otherwise. We handle getting your listing entered into the MLS accurately and reviewed by the broker."
+    a: "This service is designed for sellers who want to handle more of the sale themselves. The exact responsibilities of the seller and brokerage will be explained in the listing documents John Duran sends after your purchase."
   },
   {
-    q: "What does the broker actually do?",
-    a: "The broker reviews your submitted property details, disclosures, and photos for accuracy and MLS compliance, then submits your listing to the MLS under the brokerage's license. That review is what makes this a licensed, legitimate MLS listing instead of just a listing site."
+    q: "Who is the broker behind First Premier MLS Direct?",
+    a: "John Duran is the Broker of First Premier Real Estate Services, Inc. He has more than 36 years of real estate experience. Broker License: 0512688. Office License: CQ1025438."
   },
   {
-    q: "What is flat-fee MLS?",
-    a: "Flat-fee MLS means you pay one upfront fee to get your property listed on the MLS, instead of paying a percentage-based listing commission. You still handle the sale process yourself."
+    q: "What does the broker do?",
+    a: "John and the brokerage review the required listing information and documents, make sure the listing is prepared for the applicable MLS, and perform the MLS services included in the package you purchased."
   },
   {
-    q: "How fast will my listing go live?",
-    a: "Most completed listings are submitted within 48 hours after all required information, payment, signed documents, and usable photos are received."
+    q: "What is flat fee MLS?",
+    a: "Flat fee MLS means you pay a set upfront package price for the MLS listing services described on this site rather than paying First Premier MLS Direct a traditional percentage-based listing commission."
   },
   {
     q: "What happens after I pay?",
-    a: "You'll submit your property details, upload or schedule photos, and sign your listing agreement. Once everything is in, the broker reviews it and prepares your listing for MLS entry."
+    a: "You'll be taken to a short form asking for your name, phone number, email, and property address. Once you submit it, John Duran will be notified and will email the required listing forms and next steps directly from the brokerage."
+  },
+  {
+    q: "How fast will my listing go live?",
+    a: "Most completed listings are submitted within 48 hours after all required information, payment, signed documents, usable photos, and any other items requested by the broker have been received and approved."
   },
   {
     q: "What photos do I need?",
-    a: "That depends on your package. Basic requires seller-uploaded photos. Standard and Premium include a professional photo shoot."
+    a: "That depends on your package. The Basic package uses seller-provided photos. Standard and Premium include professional photography as described on the pricing page. John will coordinate the required photo steps with you after purchase."
   },
   {
     q: "Can I make changes after listing?",
-    a: "Yes, within the edit limit of your package. Basic does not include edits beyond corrections. Standard includes up to 2 edits. Premium includes up to 5."
+    a: "Yes, subject to the edit allowance in your package and applicable MLS rules. Basic includes corrections only, Standard includes up to 2 listing edits, and Premium includes up to 5."
   },
   {
     q: "Is photography included?",
-    a: "Photography is included with the Standard and Premium packages. Basic Package sellers upload their own photos."
+    a: "Photography is included with the Standard and Premium packages. The Basic package uses seller-provided photos."
   },
   {
-    q: "What if my listing information is incomplete?",
-    a: "We'll email you with exactly what's missing and a link to complete it. Your listing won't move to MLS submission until everything required is received."
+    q: "What if my information is incomplete?",
+    a: "John or the brokerage will contact you with the missing items. The listing will not be submitted to the MLS until the required information and documents have been received and approved."
   },
   {
     q: "What happens when my home sells?",
-    a: "Let us know so we can update or close out your listing. Reach out through the client portal or by phone."
+    a: "Contact First Premier Real Estate Services, Inc. so the brokerage can handle the required MLS status updates and closing-related listing steps."
   },
   {
     q: "Can I cancel after paying?",
-    a: "Yes, contact us as soon as possible. A full refund is available before you submit your property details. After that, refund eligibility depends on how far your listing has progressed. See our Refund Policy for the exact breakdown."
+    a: "Yes, but refund eligibility depends on whether brokerage work has started and whether the listing has already been submitted to the MLS. A full refund may be available before brokerage work begins. Once MLS submission has occurred, the package fee is non-refundable. See the Refund Policy page for the full terms."
   },
   {
     q: "What areas of Florida do you serve?",
-    a: "We work with sellers across Florida through the MLS. Contact us with your property location if you have questions about local MLS coverage."
+    a: "Coverage depends on the applicable MLS and property location. Contact us with the property address if you want to confirm coverage before purchasing."
   }
 ];
 
