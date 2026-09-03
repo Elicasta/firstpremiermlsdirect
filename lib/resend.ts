@@ -13,4 +13,4 @@ export function getResend(): Resend {
 }
 
 export const FROM_EMAIL =
-  process.env.RESEND_FROM_EMAIL ?? "First Premier MLS Direct <orders@firstpremiermlsdirect.com>";
+  process.env.RESEND_FROM_EMAIL ?? "First Premier MLS Direct <info@premiermlsdirect.com>";
