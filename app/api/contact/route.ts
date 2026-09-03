@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   try {
     await getResend().emails.send({
       from: FROM_EMAIL,
-      to: process.env.ADMIN_ALERT_EMAIL ?? "orders@firstpremiermlsdirect.com",
+      to: process.env.ADMIN_ALERT_EMAIL ?? "Jduran238@bellsouth.net",
       replyTo: email,
       subject: `New contact form message from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone ?? "—"}\n\nMessage:\n${message}`
