@@ -21,9 +21,8 @@ export function PackageSelectForm({ initialPackageSlug }: { initialPackageSlug?:
     setError(null);
 
     try {
-      // Step 1: a real order row exists before Stripe ever sees this — no seller or
-      // property info yet, just a package and a price. This is what makes sure photo
-      // uploads and everything downstream always has a real order id to attach to.
+      // Create the order before Stripe so payment and the short follow-up form share
+      // one permanent order ID from the start.
       const draftRes = await fetch("/api/orders/draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -35,7 +34,6 @@ export function PackageSelectForm({ initialPackageSlug }: { initialPackageSlug?:
       }
       const { orderId } = await draftRes.json();
 
-      // Step 2: pay first, Amazon-checkout style. Details come after.
       const checkoutRes = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -118,8 +116,8 @@ export function PackageSelectForm({ initialPackageSlug }: { initialPackageSlug?:
         </Button>
 
         <p className="mt-3 text-center text-xs text-ink/50">
-          You'll pay first, then tell us about your property. Takes about 2 minutes after
-          payment.
+          After payment, you'll complete a short contact form. John Duran will email the official
+          listing forms and next steps directly.
         </p>
       </div>
     </div>
