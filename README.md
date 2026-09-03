@@ -1,169 +1,246 @@
 # First Premier MLS Direct
 
-Flat fee MLS listing platform for First Premier Real Estate Services, Inc., a licensed Florida
-real estate brokerage.
+Flat fee MLS listing website for **First Premier Real Estate Services, Inc.**
 
-Checkout is Amazon-style, pay first: pick a package, pay, then submit property details,
-upload or schedule photos, sign a listing agreement, and the broker reviews and submits the
-listing to the MLS.
+**John Duran, Broker**  
+Broker License: **0512688**  
+Office License: **CQ1025438**
+
+## Current v1 workflow
+
+The public process is intentionally simple:
+
+1. Customer chooses Basic, Standard, or Premium.
+2. Customer pays through Stripe Checkout.
+3. Stripe returns the customer to a short submission form.
+4. Customer provides only:
+   - first name
+   - last name
+   - email
+   - phone
+   - property address
+   - city / state / ZIP
+5. The submission is stored in Supabase.
+6. Resend emails John with the paid customer, property address, package, amount, phone, and email.
+7. John sends the official listing agreement, property forms, disclosures, and package instructions manually from the brokerage email.
+8. John handles the remaining broker/MLS process directly with the seller.
+
+There is **no public automated property-detail wizard, photo uploader, e-signature flow, or client portal in the v1 customer journey**. Some older modules remain in the repository for possible future use, but they are not linked from the current public workflow.
 
 ## Stack
 
-- **Frontend:** Next.js 14 (App Router) + Tailwind CSS
-- **Database / Auth / Storage:** Supabase
-- **Payments:** Stripe Checkout
-- **Email:** Resend
-- **E-signature:** Provider-agnostic abstraction (`lib/esign.ts`) — wire up DocuSign or Dropbox Sign
-- **Hosting:** Vercel
+- Next.js 14 App Router
+- React 18
+- Tailwind CSS
+- Supabase
+- Stripe Checkout
+- Resend
+- Vercel
 
-## Getting started
+## Local setup
 
 ```bash
 npm install
-cp .env.example .env.local   # fill in real values
+cp .env.example .env.local
 npm run dev
 ```
 
-### 1. Supabase
+Fill in `.env.local` before testing checkout or email.
 
-1. Create a Supabase project.
-2. Run `supabase/schema.sql` in the SQL editor. This creates all tables, seeds the three
-   packages, sets up Row Level Security, and adds a database trigger that blocks any order
-   from reaching `ready_for_mls` or `submitted_to_mls` unless it's paid and the agreement is
-   signed.
-3. Create a public storage bucket named `property-photos` for uploaded images.
-4. Copy your project URL, anon key, and service role key into `.env.local`.
+## Required environment variables
 
-If you already ran an earlier version of this schema, two things changed and need to be
-applied by hand (both are safe to re-run):
+### App
 
-```sql
-alter table orders alter column seller_id drop not null;
-alter table orders alter column property_id drop not null;
-alter table orders add column if not exists missing_items jsonb not null default '[]'::jsonb;
+```env
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-### 2. Stripe
+Production should use the real website URL.
 
-1. Create Products/Prices for Basic ($299), Standard ($599), Premium ($999), or leave the
-   price env vars blank — `/api/checkout` will build line items on the fly as a fallback.
-2. Add a webhook endpoint pointing at `/api/webhook/stripe` listening for
-   `checkout.session.completed`. Copy the signing secret into `STRIPE_WEBHOOK_SECRET`.
+### Supabase
 
-### 3. Resend
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+```
 
-Verify a sending domain and set `RESEND_API_KEY` + `RESEND_FROM_EMAIL`.
+Run `supabase/schema.sql` in the Supabase SQL editor for a new project.
 
-### 4. E-signature
+### Stripe
 
-`lib/esign.ts` defines a provider interface with stub implementations for Dropbox Sign and
-DocuSign. Pick one, fill in the real API calls, set `ESIGN_PROVIDER`, and point your
-provider's webhook at `/api/agreement/webhook`.
+```env
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_PRICE_BASIC=
+STRIPE_PRICE_STANDARD=
+STRIPE_PRICE_PREMIUM=
+```
 
-### 5. Admin login
+Create one-time Stripe prices for:
 
-Generate a password hash and set `ADMIN_PASSWORD_HASH`:
+- Basic: $299
+- Standard: $599
+- Premium: $999
+
+Configure the Stripe webhook endpoint:
+
+```text
+/api/webhook/stripe
+```
+
+Listen for:
+
+```text
+checkout.session.completed
+```
+
+The webhook marks the order paid and sends the customer a resume link to the short contact form.
+
+The Stripe success URL also includes the Checkout Session ID. The server verifies that session as a fallback so a paid customer is not blocked if the webhook arrives slightly after the browser redirect.
+
+### Resend
+
+```env
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=First Premier MLS Direct <orders@firstpremiermlsdirect.com>
+ADMIN_ALERT_EMAIL=
+```
+
+`ADMIN_ALERT_EMAIL` is important. Set it to **John Duran's real inbox** in Vercel.
+
+When a paid customer submits the short form, John receives an email containing:
+
+- customer name
+- customer phone
+- customer email
+- property address
+- selected package
+- amount paid
+- a clear instruction to send the official listing documents and next steps
+
+The website does not send the legal/listing forms itself in v1.
+
+### Admin dashboard
+
+```env
+ADMIN_PASSWORD_HASH=
+```
+
+Generate the hash with:
 
 ```bash
-node -e "console.log(require('crypto').createHash('sha256').update('your-password').digest('hex'))"
+node -e "console.log(require('crypto').createHash('sha256').update('YOUR_PASSWORD').digest('hex'))"
 ```
 
-Admin dashboard lives at `/admin` (redirects to `/admin/login` if not authenticated).
+Admin dashboard:
 
-## The checkout flow, in order
-
-1. `/start-listing` — pick a package and add-ons only. No seller or property info yet.
-2. `POST /api/orders/draft` creates a real order row (no seller/property attached) before
-   Stripe ever loads. This is what makes sure every downstream step, including photo
-   uploads, always has a real order id to attach to. Nothing ever falls back to a fake
-   `"pending"` id.
-3. `POST /api/checkout` creates the Stripe Checkout session and redirects to Stripe.
-4. Stripe webhook (`/api/webhook/stripe`) marks the order paid and emails a "finish your
-   listing" link straight from the email Stripe collected, in case the seller closes the tab
-   before finishing.
-5. `/start-listing/details?order=...` — seller info, property info, listing copy. Submitting
-   this (`PATCH /api/orders/[id]/details`) is what actually creates the seller and property
-   rows, and is also where the real client confirmation + admin alert emails fire from, since
-   that's the first point a name and address exist.
-6. Photos step — upload or schedule. `POST /api/orders/[id]/photos` advances the order status.
-7. Agreement step — `AgreementSigner` sends the agreement via whichever e-sign provider is
-   configured. Signing webhook moves the order to `needs_review`.
-8. Admin reviews in `/admin`, sets `ready_for_mls`, `submitted_to_mls`, then `live`.
-
-## Client-facing statuses
-
-Clients never see backend status strings like `awaiting_agreement`. `lib/clientStatus.ts` maps
-every backend status down to one of six client-facing labels: Submitted, Waiting on Info, In
-Review, Ready for MLS, Submitted to MLS, On MLS. The portal (`/portal`) only ever renders
-those six.
-
-## Hard workflow rule
-
-An order cannot move to `ready_for_mls` or `submitted_to_mls` unless:
-
-- Payment is completed
-- The listing agreement is signed
-- Required seller/property data is complete
-- Photos are uploaded or a photo session is scheduled
-- The broker has approved the submission
-
-This is enforced in the admin UI and at the database level via a Postgres trigger in
-`supabase/schema.sql`.
-
-## Missing info workflow
-
-From the admin order detail modal: enter missing items (one per line), hit "Request Missing
-Info." This sends the missing-info email, logs it in `email_logs`, sets the order status to
-`correction_needed` (shown to the client as "Waiting on Info"), and stores the list on
-`orders.missing_items` so the client portal can show exactly what's needed.
-
-## Project structure
-
-```
-app/
-  start-listing/               Package + add-on selection (pre-payment)
-  start-listing/details/       Property details, photos, agreement (post-payment)
-  api/orders/draft/            Creates the draft order before Stripe
-  api/orders/[id]/details/     Creates seller + property, sends confirmation + admin alert
-  api/orders/[id]/photos/      Advances status after the photos step
-  api/checkout/                Stripe Checkout session creation
-  api/webhook/stripe/          Payment confirmation + resume-listing email
-  api/agreement/*              E-sign creation + webhook
-  api/admin/orders/[id]/       Admin GET (full detail) + PATCH (status, MLS fields, missing info)
-  admin/                       Admin dashboard + login
-  portal/                      Client portal (order status lookup, client-safe labels only)
-  refund-policy/, mls-participation-terms/, brokerage-disclosure/, terms/, privacy/
-components/IntakeForm/         PackageSelectForm (pre-payment), DetailsWizard (post-payment),
-                                shared step components used by DetailsWizard
-lib/clientStatus.ts            Backend status -> client-safe label mapping
-lib/                           Supabase clients, Stripe, Resend, validation, e-sign abstraction
-emails/                        Email copy templates
-supabase/schema.sql            Full DB schema, RLS policies, seed data, MVP-guard trigger
+```text
+/admin
 ```
 
-## Legal / compliance notes baked into the copy
+## Customer checkout flow
 
-- Every footer, legal page, and contact area shows "First Premier Real Estate Services,
-  Inc.," "Licensed Florida Real Estate Brokerage," the brokerage address (13265 SW 124
-  Street, Miami, FL 33186), and the phone number, per Florida advertising rules.
-- Copy avoids "guaranteed sale," "better MLS ranking," "sell faster," "guaranteed savings,"
-  and similar claims.
-- Hero and FAQ copy specifically avoid implying buyer agent compensation never applies — the
-  seller always chooses whether to offer it.
-- The 48-hour turnaround is always stated with its condition: "after all required
-  information, payment, signed documents, and usable photos are received."
-- Legal pages: Terms, Privacy, Refund Policy, MLS Participation Terms, Brokerage Disclosure.
+### 1. Package selection
 
-## What's stubbed vs. real
+`/start-listing`
 
-**Real and working (once env vars are filled in):** package data, pricing page, the full
-pay-first checkout flow, Supabase writes, Stripe Checkout session creation + webhook, Resend
-email sending + logging (including the resume-listing and missing-info emails), admin
-dashboard with live Supabase data including uploaded photos/files/notes/photo sessions,
-status updates, MLS number/link/public link entry, photo uploads to Supabase Storage.
+The customer chooses a package and optional add-ons.
 
-**Stubbed, needs your API keys/templates:** the two e-signature provider classes in
-`lib/esign.ts` throw a clear error until you fill in the real API calls, this is the one
-piece that depends entirely on which provider (DocuSign vs. Dropbox Sign) you choose and your
-account setup. The "Schedule a Call" button on the Contact page is a visible placeholder
-until a Calendly (or similar) link is wired in.
+### 2. Draft order
+
+`POST /api/orders/draft`
+
+A real order ID is created before Stripe Checkout. This keeps the payment and later customer submission tied to one record.
+
+### 3. Stripe Checkout
+
+`POST /api/checkout`
+
+The customer pays securely on Stripe.
+
+### 4. Payment confirmation
+
+`POST /api/webhook/stripe`
+
+Stripe marks the order as paid. A lightweight email gives the customer a link back to the short form in case they close the browser.
+
+### 5. Short submission form
+
+`/start-listing/details?order=...`
+
+The customer submits contact information and the property address only.
+
+`PATCH /api/orders/[id]/details`:
+
+- verifies the order is paid
+- stores customer contact information
+- stores the property address
+- changes the order to `awaiting_info`
+- sends John's broker alert through Resend
+
+John takes over from there.
+
+## Broker identity shown on the website
+
+The public website identifies:
+
+**First Premier Real Estate Services, Inc.**  
+**John Duran, Broker**  
+Broker License **0512688**  
+Office License **CQ1025438**
+
+This appears on the About page, homepage broker section, Contact page, footer, and Brokerage Disclosure.
+
+## Refund policy
+
+The public refund policy is available at:
+
+```text
+/refund-policy
+```
+
+It is linked directly from the footer and FAQ page.
+
+Current policy structure:
+
+- full refund may be requested before brokerage work begins
+- after brokerage work begins but before MLS submission, refund eligibility depends on work already performed and non-recoverable costs
+- after MLS submission, the flat fee MLS package is non-refundable because the primary listing service has been performed
+- add-on services are refundable only to the extent they have not been scheduled, started, performed, or committed to a third party
+- verified duplicate or incorrect charges are corrected
+- applicable non-waivable legal rights remain intact
+
+The refund policy should be reviewed by the broker and, before launch, Florida real estate counsel if John wants legal approval of the exact cancellation/refund terms.
+
+## Public legal pages
+
+- `/terms`
+- `/privacy`
+- `/refund-policy`
+- `/mls-participation-terms`
+- `/brokerage-disclosure`
+
+## Public copy rules
+
+The site avoids claims such as:
+
+- guaranteed sale
+- guaranteed savings
+- better MLS ranking
+- guaranteed faster sale
+
+The 48-hour language is conditional on the brokerage receiving and approving all required information, signed documents, usable photos, and other requested items.
+
+## Legacy / future modules
+
+The repository still contains code for features that may be useful later, including:
+
+- client portal
+- full property intake wizard
+- photo uploads
+- e-signature provider abstraction
+- deeper order statuses
+- admin listing-posted and missing-info tools
+
+These are intentionally not part of the public v1 process. Keeping them in the repo preserves future work without forcing John into an automated process before he is ready.
