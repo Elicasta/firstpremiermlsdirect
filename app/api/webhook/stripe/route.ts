@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import { getResend, FROM_EMAIL } from "@/lib/resend";
+import { getResend, FROM_EMAIL, REPLY_TO_EMAIL } from "@/lib/resend";
 
 // Stripe webhook: payment happens before customer contact information is collected.
 // Mark the order paid, then send a lightweight resume link to the email Stripe captured.
@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
           await getResend().emails.send({
             from: FROM_EMAIL,
             to: customerEmail,
+            replyTo: REPLY_TO_EMAIL,
             subject: "Payment received — send us your contact information",
             text: `Payment received. Thank you for choosing First Premier MLS Direct.
 
