@@ -10,7 +10,11 @@ export function Footer() {
             <p className="mt-2 text-sm text-white/70">
               First Premier Real Estate Services, Inc.
               <br />
-              Licensed Florida Real Estate Brokerage
+              John Duran, Broker
+              <br />
+              Broker License 0512688
+              <br />
+              Office License CQ1025438
               <br />
               13265 SW 124 Street
               <br />
@@ -29,7 +33,7 @@ export function Footer() {
             <ul className="mt-2 space-y-1 text-sm text-white/80">
               <li><Link href="/pricing" className="hover:text-white focus-ring">Pricing</Link></li>
               <li><Link href="/how-it-works" className="hover:text-white focus-ring">How It Works</Link></li>
-              <li><Link href="/about" className="hover:text-white focus-ring">About the Broker</Link></li>
+              <li><Link href="/about" className="hover:text-white focus-ring">About John Duran</Link></li>
               <li><Link href="/faq" className="hover:text-white focus-ring">FAQ</Link></li>
               <li><Link href="/portal" className="hover:text-white focus-ring">Client Portal</Link></li>
             </ul>
@@ -48,7 +52,7 @@ export function Footer() {
 
           <div>
             <p className="font-display text-sm font-bold uppercase tracking-wide text-gold">
-              More Legal
+              Brokerage
             </p>
             <ul className="mt-2 space-y-1 text-sm text-white/80">
               <li><Link href="/mls-participation-terms" className="hover:text-white focus-ring">MLS Participation Terms</Link></li>
@@ -60,7 +64,7 @@ export function Footer() {
 
         <p className="mt-8 border-t border-white/10 pt-4 text-xs text-white/50">
           &copy; {new Date().getFullYear()} First Premier Real Estate Services, Inc. All rights
-          reserved. Equal Housing Opportunity. Flat fee MLS exposure — not a guarantee of sale.
+          reserved. Equal Housing Opportunity. Flat fee MLS exposure is not a guarantee of sale.
         </p>
       </div>
     </footer>
