@@ -1,5 +1,6 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { stripe } from "@/lib/stripe";
+import { sendAdminAlertEmail, sendClientConfirmationEmail } from "@/lib/email";
 import { ContactSubmissionForm } from "@/components/IntakeForm/ContactSubmissionForm";
 import { ButtonLink } from "@/components/ui/Button";
 
@@ -30,9 +31,8 @@ export default async function StartListingDetailsPage({
 
   let paymentConfirmed = order.payment_status === "paid";
 
-  // Stripe can redirect a customer before the webhook finishes. Verify the Session
-  // server-side so the confirmation page never incorrectly blocks a successful payer.
-  // The webhook remains authoritative for updating the database and sending emails.
+  // Stripe can redirect a customer before the webhook finishes, or a webhook can fail
+  // because of a temporary network/domain issue. Verify the Checkout Session server-side.
   if (!paymentConfirmed && sessionId && sessionId === order.stripe_session_id) {
     try {
       const session = await stripe.checkout.sessions.retrieve(sessionId);
@@ -46,6 +46,42 @@ export default async function StartListingDetailsPage({
     return (
       <MissingOrder reason="We haven't confirmed payment for this order yet. If you just paid, wait a moment and refresh this page. If the problem continues, call 305-233-0447." />
     );
+  }
+
+  // Reconcile the database on the return page too. The Stripe webhook is still the primary
+  // payment event, but this fallback makes a successful checkout self-healing if the webhook
+  // is delayed or missed. Email logs keep the notifications idempotent.
+  if (order.payment_status !== "paid") {
+    await supabase
+      .from("orders")
+      .update({ payment_status: "paid", order_status: "awaiting_info" })
+      .eq("id", orderId);
+  }
+
+  if (order.seller_id && order.property_id) {
+    const { data: fullOrder } = await supabase
+      .from("orders")
+      .select("*, sellers(*), properties(*), packages(*)")
+      .eq("id", orderId)
+      .single();
+
+    if (fullOrder) {
+      const { data: existingLogs } = await supabase
+        .from("email_logs")
+        .select("email_type, status")
+        .eq("order_id", orderId)
+        .in("email_type", ["admin_alert", "client_confirmation"])
+        .eq("status", "sent");
+
+      const sentTypes = new Set((existingLogs ?? []).map((row) => row.email_type));
+
+      if (!sentTypes.has("admin_alert")) {
+        await sendAdminAlertEmail(fullOrder);
+      }
+      if (!sentTypes.has("client_confirmation")) {
+        await sendClientConfirmationEmail(fullOrder);
+      }
+    }
   }
 
   // Backward compatibility for any older checkout session created before contact info
@@ -84,7 +120,7 @@ export default async function StartListingDetailsPage({
           Thank You. John Will Take It From Here.
         </h1>
         <p className="mt-4 text-ink/70">
-          Your order is confirmed. We sent a confirmation email, and John Duran will follow up with
+          Your order is confirmed. We sent a confirmation email with your purchase ID, and John Duran will follow up with
           the official brokerage forms and next steps.
         </p>
       </div>
@@ -114,7 +150,7 @@ export default async function StartListingDetailsPage({
         </div>
 
         <p className="mt-5 text-xs text-ink/50">
-          Order ID: <span className="font-semibold text-navy">{orderId}</span>
+          Purchase ID: <span className="font-semibold text-navy">{orderId}</span>
         </p>
 
         <div className="mt-6">
