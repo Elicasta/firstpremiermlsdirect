@@ -5,6 +5,12 @@ const WARM = "#F8F5EF";
 const INK = "#1F2937";
 const MUTED = "#6B7280";
 const BORDER = "#E5E7EB";
+const SOFT = "#F7F9FC";
+
+export type EmailAddon = {
+  name: string;
+  price: string;
+};
 
 function esc(value: unknown) {
   return String(value ?? "")
@@ -17,9 +23,56 @@ function esc(value: unknown) {
 
 function line(label: string, value: string) {
   return `<tr>
-    <td style="padding-top:8px;padding-bottom:8px;padding-left:0;padding-right:16px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:${MUTED};vertical-align:top;white-space:nowrap;">${esc(label)}</td>
-    <td style="padding-top:8px;padding-bottom:8px;padding-left:0;padding-right:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:20px;color:${INK};font-weight:600;vertical-align:top;">${esc(value)}</td>
+    <td width="120" style="padding-top:10px;padding-bottom:10px;padding-left:0;padding-right:18px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:${MUTED};vertical-align:top;white-space:nowrap;">${esc(label)}</td>
+    <td style="padding-top:10px;padding-bottom:10px;padding-left:0;padding-right:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:21px;color:${INK};font-weight:700;vertical-align:top;">${esc(value)}</td>
   </tr>`;
+}
+
+function addOnsRow(addons: EmailAddon[]) {
+  if (!addons.length) return line("Add-ons", "None");
+
+  const rows = addons
+    .map(
+      (addon, index) => `<tr>
+        <td style="padding-top:${index === 0 ? "0" : "7px"};padding-bottom:7px;padding-left:0;padding-right:12px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:20px;color:${INK};font-weight:600;vertical-align:top;">${esc(addon.name)}</td>
+        <td align="right" style="padding-top:${index === 0 ? "0" : "7px"};padding-bottom:7px;padding-left:10px;padding-right:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:20px;color:${NAVY};font-weight:800;vertical-align:top;white-space:nowrap;">${esc(addon.price)}</td>
+      </tr>`
+    )
+    .join("");
+
+  return `<tr>
+    <td width="120" style="padding-top:10px;padding-bottom:10px;padding-left:0;padding-right:18px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:${MUTED};vertical-align:top;white-space:nowrap;">Add-ons</td>
+    <td style="padding-top:10px;padding-bottom:3px;padding-left:0;padding-right:0;vertical-align:top;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+        ${rows}
+      </table>
+    </td>
+  </tr>`;
+}
+
+function purchaseDetails(params: {
+  packageName: string;
+  addons: EmailAddon[];
+  amount: string;
+  orderId: string;
+}) {
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${SOFT}" style="width:100%;margin-top:22px;background-color:${SOFT};border:1px solid ${BORDER};border-radius:8px;">
+    <tr>
+      <td style="padding-top:14px;padding-bottom:14px;padding-left:18px;padding-right:18px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+          ${line("Package", params.packageName)}
+          ${addOnsRow(params.addons)}
+          ${line("Amount paid", params.amount)}
+          ${line("Purchase ID", params.orderId)}
+        </table>
+      </td>
+    </tr>
+  </table>`;
+}
+
+function addOnsText(addons: EmailAddon[]) {
+  if (!addons.length) return "Add-ons: None";
+  return `Add-ons:\n${addons.map((addon) => `- ${addon.name} ${addon.price}`).join("\n")}`;
 }
 
 function button(label: string, href: string) {
@@ -46,11 +99,13 @@ function shell(params: {
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 </head>
 <body style="margin:0;padding:0;background-color:${WARM};">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${esc(params.preview)}</div>
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${WARM}" style="width:100%;background-color:${WARM};">
     <tr>
       <td align="center" style="padding-top:24px;padding-bottom:24px;padding-left:12px;padding-right:12px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
+          <tr>
+            <td style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;font-size:1px;line-height:1px;">${esc(params.preview)}</td>
+          </tr>
           <tr>
             <td bgcolor="${NAVY}" style="background-color:${NAVY};padding-top:24px;padding-bottom:24px;padding-left:28px;padding-right:28px;border-radius:10px 10px 0 0;">
               <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:24px;line-height:30px;color:#ffffff;">First Premier <span style="color:${GOLD};">MLS Direct</span></p>
@@ -61,7 +116,9 @@ function shell(params: {
             <td bgcolor="#ffffff" style="background-color:#ffffff;padding-top:32px;padding-bottom:32px;padding-left:28px;padding-right:28px;border-left:1px solid ${BORDER};border-right:1px solid ${BORDER};">
               <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:16px;color:${GOLD};font-weight:700;letter-spacing:1px;text-transform:uppercase;">${esc(params.eyebrow)}</p>
               <h1 style="margin-top:8px;margin-bottom:0;font-family:Arial,Helvetica,sans-serif;font-size:28px;line-height:34px;color:${NAVY};font-weight:800;">${esc(params.title)}</h1>
-              <div style="margin-top:20px;">${params.body}</div>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:20px;">
+                <tr><td>${params.body}</td></tr>
+              </table>
             </td>
           </tr>
           <tr>
@@ -83,6 +140,7 @@ function shell(params: {
 
 export function adminAlertTemplate(params: {
   packageName: string;
+  addons: EmailAddon[];
   amount: string;
   sellerName: string;
   sellerPhone: string;
@@ -91,7 +149,7 @@ export function adminAlertTemplate(params: {
   orderId: string;
 }) {
   const subject = `New paid MLS order: ${params.sellerName}`;
-  const text = `John,\n\nA customer completed payment for First Premier MLS Direct.\n\nCustomer\nName: ${params.sellerName}\nPhone: ${params.sellerPhone}\nEmail: ${params.sellerEmail}\nProperty: ${params.propertyAddress}\n\nOrder\nPackage: ${params.packageName}\nAmount paid: ${params.amount}\nOrder ID: ${params.orderId}\n\nNext action\nSend the customer the required listing agreement, property forms, and package-specific instructions.\n\nFirst Premier MLS Direct`;
+  const text = `John,\n\nA customer completed payment for First Premier MLS Direct and is ready for follow-up.\n\nCUSTOMER\nName: ${params.sellerName}\nPhone: ${params.sellerPhone}\nEmail: ${params.sellerEmail}\nProperty: ${params.propertyAddress}\n\nPURCHASE\nPackage: ${params.packageName}\n${addOnsText(params.addons)}\nAmount paid: ${params.amount}\nPurchase ID: ${params.orderId}\n\nNEXT ACTION\nSend the customer the required listing agreement, property forms, and package-specific instructions.\n\nFirst Premier MLS Direct`;
 
   const body = `
     <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:${INK};">John, a customer completed payment and is ready for your brokerage follow-up.</p>
@@ -100,10 +158,8 @@ export function adminAlertTemplate(params: {
       ${line("Phone", params.sellerPhone)}
       ${line("Email", params.sellerEmail)}
       ${line("Property", params.propertyAddress)}
-      ${line("Package", params.packageName)}
-      ${line("Amount paid", params.amount)}
-      ${line("Order ID", params.orderId)}
     </table>
+    ${purchaseDetails({ packageName: params.packageName, addons: params.addons, amount: params.amount, orderId: params.orderId })}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:22px;">
       <tr>
         <td bgcolor="#FFF8E5" style="background-color:#FFF8E5;border-left:4px solid ${GOLD};padding-top:16px;padding-bottom:16px;padding-left:16px;padding-right:16px;">
@@ -124,21 +180,20 @@ export function clientConfirmationTemplate(params: {
   firstName: string;
   propertyAddress: string;
   packageName: string;
+  addons: EmailAddon[];
+  amount: string;
   orderId: string;
 }) {
   const subject = "Your First Premier MLS Direct payment is confirmed";
-  const text = `Hi ${params.firstName},\n\nThank you for choosing First Premier MLS Direct. Your payment has been confirmed.\n\nProperty: ${params.propertyAddress}\nPackage: ${params.packageName}\nOrder ID: ${params.orderId}\n\nJohn Duran, Broker, will email the required listing forms and next steps directly from First Premier Real Estate Services, Inc.\n\nMost completed listings are submitted within 48 hours after all required information, payment, signed documents, and usable photos are received and approved by the broker.\n\nFirst Premier MLS Direct\n305-233-0447\ninfo@premiermlsdirect.com`;
+  const text = `Hi ${params.firstName},\n\nThank you for choosing First Premier MLS Direct. Your payment is confirmed and your order is now with the brokerage.\n\nProperty: ${params.propertyAddress}\n\nPURCHASE\nPackage: ${params.packageName}\n${addOnsText(params.addons)}\nAmount paid: ${params.amount}\nPurchase ID: ${params.orderId}\n\nJohn Duran, Broker, will email the required listing forms and next steps directly from First Premier Real Estate Services, Inc.\n\nFirst Premier MLS Direct\n305-233-0447\ninfo@premiermlsdirect.com`;
 
   const body = `
     <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:${INK};">Hi ${esc(params.firstName)},</p>
     <p style="margin-top:12px;margin-bottom:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:${INK};">Thank you for choosing First Premier MLS Direct. Your payment is confirmed and your order is now with the brokerage.</p>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:22px;border-top:1px solid ${BORDER};border-bottom:1px solid ${BORDER};">
-      ${line("Property", params.propertyAddress)}
-      ${line("Package", params.packageName)}
-      ${line("Order ID", params.orderId)}
-    </table>
+    <p style="margin-top:18px;margin-bottom:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:${MUTED};">Property</p>
+    <p style="margin-top:3px;margin-bottom:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:22px;color:${INK};font-weight:700;">${esc(params.propertyAddress)}</p>
+    ${purchaseDetails({ packageName: params.packageName, addons: params.addons, amount: params.amount, orderId: params.orderId })}
     <p style="margin-top:22px;margin-bottom:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:${INK};">John Duran, Broker, will email the required listing forms and next steps directly from First Premier Real Estate Services, Inc.</p>
-    <p style="margin-top:12px;margin-bottom:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:21px;color:${MUTED};">Most completed listings are submitted within 48 hours after all required information, payment, signed documents, and usable photos are received and approved by the broker.</p>
     ${button("Email First Premier MLS Direct", "mailto:info@premiermlsdirect.com")}`;
 
   return {
