@@ -1,6 +1,6 @@
-// Plain-text/HTML email templates matching the exact copy from the business brief.
-// Swap these for React Email components later if you want richer HTML — the
-// send functions in lib/email.ts just need a `subject` and `html`/`text` back.
+// Plain-text email templates for the current broker-led workflow.
+// The website collects payment and basic contact information. John Duran then
+// sends the official listing forms and next steps from the brokerage email.
 
 export function adminAlertTemplate(params: {
   packageName: string;
@@ -13,20 +13,25 @@ export function adminAlertTemplate(params: {
   agreementSigned: boolean;
   photoSessionNeeded: boolean;
 }) {
-  const subject = `New MLS Listing Order: ${params.packageName} - ${params.propertyAddress}`;
-  const text = `A new First Premier MLS Direct order has been submitted.
+  const subject = `PAID MLS ORDER - ${params.sellerName} - ${params.propertyAddress}`;
+  const text = `John,
 
-Package: ${params.packageName}
-Price Paid: ${params.amount}
-Seller: ${params.sellerName}
+A paid First Premier MLS Direct customer submitted their contact information and is ready for your follow-up.
+
+CUSTOMER
+Name: ${params.sellerName}
 Phone: ${params.sellerPhone}
 Email: ${params.sellerEmail}
 Property: ${params.propertyAddress}
-Photos Uploaded: ${params.photoCount}
-Agreement Signed: ${params.agreementSigned ? "Yes" : "No"}
-Photo Session Needed: ${params.photoSessionNeeded ? "Yes" : "No"}
 
-Review the submission in the admin dashboard.`;
+ORDER
+Package: ${params.packageName}
+Amount Paid: ${params.amount}
+
+NEXT ACTION
+Send the customer the required listing agreement, property forms, and package-specific instructions from your brokerage email.
+
+First Premier MLS Direct`;
   return { subject, text };
 }
 
@@ -42,26 +47,19 @@ export function clientConfirmationTemplate(params: {
 
 Thank you for choosing First Premier MLS Direct.
 
-We received your listing request for:
-
+We received your information for:
 ${params.propertyAddress}
 
-Your selected package:
-
-${params.packageName}
-
+Package: ${params.packageName}
 Order ID: ${params.orderId}
-Check your listing status anytime here:
-${params.portalLink}
 
-Our team will review your submission, signed agreement, payment, property details, and photos. Once everything is complete and approved, your listing will be prepared for MLS submission.
+John Duran, Broker, will email the required listing forms and next steps directly from First Premier Real Estate Services, Inc.
 
-Most completed listings are submitted within 48 hours after all required items are received.
-
-If we need anything else, we'll contact you directly.
+Once all required information, signed documents, usable photos, and any other items requested by the broker are received and approved, most completed listings are submitted within 48 hours.
 
 Thank you,
 First Premier MLS Direct
+First Premier Real Estate Services, Inc.
 305-233-0447`;
   return { subject, text };
 }
@@ -72,21 +70,18 @@ export function missingInfoTemplate(params: {
   missingItems: string;
   portalLink: string;
 }) {
-  const subject = "We need one more item before your MLS listing can move forward";
+  const subject = "We need additional information for your MLS listing";
   const text = `Hi ${params.firstName},
 
 We reviewed your listing request for ${params.propertyAddress}, but we still need the following before we can move forward:
 
 ${params.missingItems}
 
-Please upload or complete these items here:
-
-${params.portalLink}
-
-Once everything is complete, we'll continue preparing your listing for MLS submission.
+Please reply to the brokerage's email with the requested information or follow the instructions John provided.
 
 Thank you,
-First Premier MLS Direct`;
+First Premier MLS Direct
+First Premier Real Estate Services, Inc.`;
   return { subject, text };
 }
 
@@ -113,6 +108,7 @@ Public Listing Link: ${params.publicLink}
 Please review the listing and let us know if you see anything that needs correction.
 
 Thank you,
-First Premier MLS Direct`;
+First Premier MLS Direct
+First Premier Real Estate Services, Inc.`;
   return { subject, text };
 }
