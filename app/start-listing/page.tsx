@@ -14,9 +14,9 @@ export default function StartListingPage({
           Start Your Listing
         </h1>
         <p className="mt-4 text-ink/70">
-          Choose your package and pay securely online. After payment, you'll complete a short
-          contact form with your name, phone, email, and property address. John Duran will then
-          email the official listing forms and next steps directly from the brokerage.
+          Choose your package, enter your basic contact and property information, then pay securely
+          through Stripe. After payment, John Duran will email the official listing forms and next
+          steps directly from the brokerage.
         </p>
       </div>
       <div className="mt-10">
