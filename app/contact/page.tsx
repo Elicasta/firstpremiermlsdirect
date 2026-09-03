@@ -45,6 +45,13 @@ export default function ContactPage() {
       <h1 className="font-display text-3xl font-extrabold sm:text-4xl text-navy">Contact Us</h1>
       <p className="mt-4 text-ink/70">Need help choosing a package or have a question about your listing?</p>
 
+      <div className="mt-6 rounded-lg border border-gray bg-gray/60 p-5">
+        <p className="font-display text-sm font-bold uppercase tracking-wide text-gold">Licensed Brokerage</p>
+        <p className="mt-1 font-display text-lg font-bold text-navy">John Duran, Broker</p>
+        <p className="mt-1 text-sm text-ink/70">First Premier Real Estate Services, Inc.</p>
+        <p className="mt-2 text-xs text-ink/55">Broker License 0512688 · Office License CQ1025438</p>
+      </div>
+
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         <a
           href="tel:3052330447"
