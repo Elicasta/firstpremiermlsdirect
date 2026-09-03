@@ -8,7 +8,7 @@ import { ButtonLink } from "./ui/Button";
 const NAV = [
   { href: "/pricing", label: "Pricing" },
   { href: "/how-it-works", label: "How It Works" },
-  { href: "/about", label: "About the Broker" },
+  { href: "/about", label: "About John" },
   { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" }
 ];
