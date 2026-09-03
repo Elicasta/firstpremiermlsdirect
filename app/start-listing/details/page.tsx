@@ -1,4 +1,5 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
+import { stripe } from "@/lib/stripe";
 import { ContactSubmissionForm } from "@/components/IntakeForm/ContactSubmissionForm";
 import { ButtonLink } from "@/components/ui/Button";
 
@@ -7,9 +8,10 @@ export const metadata = { title: "Complete Your Order | First Premier MLS Direct
 export default async function StartListingDetailsPage({
   searchParams
 }: {
-  searchParams: { order?: string };
+  searchParams: { order?: string; session_id?: string };
 }) {
   const orderId = searchParams.order;
+  const sessionId = searchParams.session_id;
 
   if (!orderId) {
     return <MissingOrder reason="We couldn't find an order to continue. Start over below." />;
@@ -18,7 +20,7 @@ export default async function StartListingDetailsPage({
   const supabase = createServiceRoleClient();
   const { data: order } = await supabase
     .from("orders")
-    .select("id, payment_status")
+    .select("id, payment_status, stripe_session_id")
     .eq("id", orderId)
     .single();
 
@@ -26,9 +28,29 @@ export default async function StartListingDetailsPage({
     return <MissingOrder reason="We couldn't find that order. Start over below." />;
   }
 
-  if (order.payment_status !== "paid") {
+  let paymentConfirmed = order.payment_status === "paid";
+
+  // Stripe can redirect the customer a fraction of a second before our webhook is
+  // processed. Verify the returned Checkout Session server-side so a paid customer
+  // never gets incorrectly blocked from the contact form.
+  if (!paymentConfirmed && sessionId && sessionId === order.stripe_session_id) {
+    try {
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      if (session.metadata?.orderId === orderId && session.payment_status === "paid") {
+        await supabase
+          .from("orders")
+          .update({ payment_status: "paid", order_status: "awaiting_info" })
+          .eq("id", orderId);
+        paymentConfirmed = true;
+      }
+    } catch (error) {
+      console.error("Unable to verify Stripe Checkout Session on return", error);
+    }
+  }
+
+  if (!paymentConfirmed) {
     return (
-      <MissingOrder reason="Payment hasn't gone through yet for this order. If you already paid, give it a minute and refresh." />
+      <MissingOrder reason="We haven't confirmed payment for this order yet. If you just paid, wait a moment and refresh this page. If the problem continues, call 305-233-0447." />
     );
   }
 
