@@ -39,10 +39,10 @@ function fullAddress(order: any) {
 function packageSummary(order: any) {
   const packageName = order.packages?.name ?? "MLS Package";
   const selectedAddonIds = Array.isArray(order.selected_addons) ? order.selected_addons : [];
-  const selectedAddons = selectedAddonIds
-    .map((id: string) => ADDONS.find((addon) => addon.id === id))
-    .filter(Boolean)
-    .map((addon) => `${addon!.name} (+$${addon!.price})`);
+  const selectedAddons = selectedAddonIds.flatMap((id: string) => {
+    const addon = ADDONS.find((item) => item.id === id);
+    return addon ? [`${addon.name} (+$${addon.price})`] : [];
+  });
 
   if (!selectedAddons.length) return `${packageName} • No add-ons`;
   return `${packageName} • Add-ons: ${selectedAddons.join(", ")}`;
