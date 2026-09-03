@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import { getResend, FROM_EMAIL, REPLY_TO_EMAIL } from "@/lib/resend";
+import { sendAdminAlertEmail, sendClientConfirmationEmail } from "@/lib/email";
 
-// Stripe webhook: payment happens before customer contact information is collected.
-// Mark the order paid, then send a lightweight resume link to the email Stripe captured.
-// John receives the broker alert only after the customer submits the short contact form.
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const signature = req.headers.get("stripe-signature");
@@ -21,40 +18,42 @@ export async function POST(req: NextRequest) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as {
       metadata?: { orderId?: string };
-      customer_details?: { email?: string | null } | null;
+      payment_status?: string;
     };
     const orderId = session.metadata?.orderId;
-    const customerEmail = session.customer_details?.email;
 
-    if (orderId) {
+    if (orderId && session.payment_status === "paid") {
       const supabase = createServiceRoleClient();
+
       await supabase
         .from("orders")
         .update({ payment_status: "paid", order_status: "awaiting_info" })
         .eq("id", orderId);
 
-      if (customerEmail) {
-        const detailsLink = `${process.env.NEXT_PUBLIC_SITE_URL}/start-listing/details?order=${orderId}`;
-        try {
-          await getResend().emails.send({
-            from: FROM_EMAIL,
-            to: customerEmail,
-            replyTo: REPLY_TO_EMAIL,
-            subject: "Payment received — send us your contact information",
-            text: `Payment received. Thank you for choosing First Premier MLS Direct.
+      const { data: order } = await supabase
+        .from("orders")
+        .select("*, sellers(*), properties(*), packages(*)")
+        .eq("id", orderId)
+        .single();
 
-Order ID: ${orderId}
+      // New orders already contain contact/property info before Checkout. Older in-flight
+      // test orders may not. Those older orders fall back to the post-payment form and the
+      // details endpoint sends the emails once the missing contact data is supplied.
+      if (order?.seller_id && order?.property_id) {
+        const { data: existingLogs } = await supabase
+          .from("email_logs")
+          .select("email_type, status")
+          .eq("order_id", orderId)
+          .in("email_type", ["admin_alert", "client_confirmation"])
+          .eq("status", "sent");
 
-Please complete the short contact form here:
-${detailsLink}
+        const sentTypes = new Set((existingLogs ?? []).map((row) => row.email_type));
 
-We only need your name, phone number, email, and property address. After you submit it, John Duran, Broker, will email the official listing forms and next steps directly from First Premier Real Estate Services, Inc.
-
-First Premier MLS Direct
-305-233-0447`
-          });
-        } catch (err) {
-          console.error("Post-payment resume email failed", err);
+        if (!sentTypes.has("admin_alert")) {
+          await sendAdminAlertEmail(order);
+        }
+        if (!sentTypes.has("client_confirmation")) {
+          await sendClientConfirmationEmail(order);
         }
       }
     }
