@@ -2,7 +2,7 @@ export const metadata = { title: "Brokerage Disclosure | First Premier MLS Direc
 
 export default function BrokerageDisclosurePage() {
   return (
-    <section className="mx-auto max-w-3xl px-4 py-12 md:py-16 prose prose-sm max-w-none">
+    <section className="mx-auto max-w-3xl px-4 py-12 md:py-16">
       <h1 className="font-display text-3xl font-extrabold sm:text-4xl text-navy">Brokerage Disclosure</h1>
 
       <p className="mt-6 text-ink/80">
@@ -12,41 +12,42 @@ export default function BrokerageDisclosurePage() {
 
       <div className="mt-6 rounded-lg bg-gray p-6 text-ink/80">
         <p className="font-display font-bold text-navy">First Premier Real Estate Services, Inc.</p>
-        <p>Licensed Florida Real Estate Brokerage</p>
-        <p>13265 SW 124 Street</p>
+        <p className="mt-1">John Duran, Broker</p>
+        <p>Broker License 0512688</p>
+        <p>Office License CQ1025438</p>
+        <p className="mt-2">13265 SW 124 Street</p>
         <p>Miami, FL 33186</p>
         <p>305-233-0447</p>
       </div>
 
-      <h2 className="mt-8 font-display text-xl font-bold text-navy">Role of the Brokerage</h2>
+      <h2 className="mt-8 font-display text-xl font-bold text-navy">Flat Fee MLS Service</h2>
       <p className="mt-2 text-ink/80">
-        When you purchase a flat fee MLS listing package, First Premier Real Estate Services,
-        Inc. acts as the listing broker of record for purposes of entering your property into
-        the MLS. This is a limited-service arrangement: the brokerage handles MLS entry, listing
-        review, and compliance with MLS rules. It does not include the full scope of services a
-        traditional full-service listing agent provides, such as negotiating offers on your
-        behalf, hosting open houses, or representing you at closing, unless you separately
-        arrange for those services.
+        Purchasing a package begins the service process but does not replace the required
+        brokerage documents. After payment and submission of your contact information, John
+        Duran will send the applicable listing agreement, disclosures, property forms, and other
+        instructions. The exact brokerage relationship and scope of services are governed by the
+        documents you sign, applicable Florida law, and the rules of the applicable MLS.
       </p>
 
-      <h2 className="mt-8 font-display text-xl font-bold text-navy">No Dual Agency by Default</h2>
+      <h2 className="mt-8 font-display text-xl font-bold text-navy">Scope of Service</h2>
       <p className="mt-2 text-ink/80">
-        First Premier Real Estate Services, Inc. does not automatically represent buyers who
-        inquire about your listing. If a buyer works with their own agent, that agent
-        represents the buyer, not you or the brokerage.
+        Flat fee MLS packages are limited-service offerings. Services vary by package and may not
+        include every service typically associated with a traditional full-service real estate
+        listing. Review the selected package and your brokerage documents carefully so you know
+        which responsibilities are handled by you and which are handled by the brokerage.
       </p>
 
-      <h2 className="mt-8 font-display text-xl font-bold text-navy">Advertising Compliance</h2>
+      <h2 className="mt-8 font-display text-xl font-bold text-navy">MLS Submission</h2>
       <p className="mt-2 text-ink/80">
-        In accordance with Florida real estate advertising rules, the licensed brokerage name
-        is shown next to or near this brand's contact information throughout the site, so it's
-        always clear you're working with a licensed brokerage, not just a listing platform.
+        A property is not submitted to the MLS solely because a package was purchased. Required
+        information, signed documents, photos, and any other items requested by the broker must
+        be received and approved before submission.
       </p>
 
       <h2 className="mt-8 font-display text-xl font-bold text-navy">Questions</h2>
       <p className="mt-2 text-ink/80">
-        Call 305-233-0447 if you have questions about the brokerage relationship before you
-        purchase a package.
+        Call 305-233-0447 if you have questions about the brokerage relationship or the scope of
+        a package before purchasing.
       </p>
     </section>
   );
