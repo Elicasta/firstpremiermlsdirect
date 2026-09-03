@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import { sendAdminAlertEmail } from "@/lib/email";
+import { sendAdminAlertEmail, sendClientConfirmationEmail } from "@/lib/email";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -55,8 +55,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     last_name: lastName,
     email,
     phone,
-    // For this simplified first version, the only address collected is the property address.
-    // John will collect the seller's full mailing information in the listing documents.
     mailing_address: fullAddress,
     preferred_contact_method: "email",
     is_legal_owner: true,
@@ -68,7 +66,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     city,
     state,
     zip,
-    // Detailed listing data is intentionally collected later by John via the broker forms.
     property_type: "Pending broker intake",
     bedrooms: 0,
     bathrooms: 0,
@@ -137,9 +134,21 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     return NextResponse.json({ error: orderError?.message ?? "Failed to update order." }, { status: 500 });
   }
 
-  // Resend notifies John. He then sends the official listing forms and next steps
-  // from his brokerage email, which is intentionally manual in this first version.
-  await sendAdminAlertEmail(order);
+  const { data: existingLogs } = await supabase
+    .from("email_logs")
+    .select("email_type, status")
+    .eq("order_id", params.id)
+    .in("email_type", ["admin_alert", "client_confirmation"])
+    .eq("status", "sent");
+
+  const sentTypes = new Set((existingLogs ?? []).map((row) => row.email_type));
+
+  if (!sentTypes.has("admin_alert")) {
+    await sendAdminAlertEmail(order);
+  }
+  if (!sentTypes.has("client_confirmation")) {
+    await sendClientConfirmationEmail(order);
+  }
 
   return NextResponse.json({ success: true });
 }
