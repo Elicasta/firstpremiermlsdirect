@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contactFormSchema } from "@/lib/validations";
 import { getResend, FROM_EMAIL } from "@/lib/resend";
+import { BROKER_NOTIFICATION_EMAIL } from "@/lib/contact";
 import { contactAlertTemplate } from "@/emails/templates";
 
 export async function POST(req: NextRequest) {
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
   try {
     await getResend().emails.send({
       from: FROM_EMAIL,
-      to: process.env.ADMIN_ALERT_EMAIL ?? "Jduran238@bellsouth.net",
+      to: BROKER_NOTIFICATION_EMAIL,
       replyTo: email,
       subject: template.subject,
       text: template.text,
