@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PUBLIC_CONTACT_EMAIL } from "@/lib/contact";
 
 export function Footer() {
   return (
@@ -22,6 +23,10 @@ export function Footer() {
               <br />
               <a href="tel:3052330447" className="hover:text-gold focus-ring">
                 305-233-0447
+              </a>
+              <br />
+              <a href={`mailto:${PUBLIC_CONTACT_EMAIL}`} className="hover:text-gold focus-ring">
+                {PUBLIC_CONTACT_EMAIL}
               </a>
             </p>
           </div>
