@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { contactFormSchema } from "@/lib/validations";
+import { PUBLIC_CONTACT_EMAIL } from "@/lib/contact";
 import { Button } from "@/components/ui/Button";
 import { Phone, MessageSquare, Mail, CalendarClock } from "lucide-react";
 
@@ -76,13 +77,13 @@ export default function ContactPage() {
         </a>
 
         <a
-          href="mailto:orders@firstpremiermlsdirect.com"
+          href={`mailto:${PUBLIC_CONTACT_EMAIL}`}
           className="flex items-center gap-3 rounded-md border border-gray bg-white p-4 hover:border-blue"
         >
           <Mail className="h-5 w-5 text-blue" aria-hidden="true" />
           <div>
             <p className="font-display text-sm font-bold text-navy">Email</p>
-            <p className="text-sm text-ink/60">orders@firstpremiermlsdirect.com</p>
+            <p className="text-sm text-ink/60">{PUBLIC_CONTACT_EMAIL}</p>
           </div>
         </a>
 
